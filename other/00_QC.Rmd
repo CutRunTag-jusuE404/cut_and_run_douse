@@ -1,0 +1,53 @@
+---
+title: "QC of samples"
+author: "Anna V. Protasio"
+date: "03/10/2019"
+output: html_document
+---
+
+## Load samples 
+
+Back at processing the peaks, let's load DiffBind, plus other packages that we need to execute many functions in this experiment. 
+
+```{r, setup, warning=FALSE, message=FALSE}
+require("knitr")
+# specified the root directory for the project and is maintain throughout Notebook
+knitr::opts_chunk$set(echo = F, warning=FALSE, message=FALSE, root.dir = "/Volumes/GoogleDrive/Shared drives/Douse_Protasio/git_repo/cut_and_run_douse")
+
+library(DiffBind)
+library(GenomicRanges)
+library(DESeq2)
+library(gdata)
+library(rprojroot)
+
+register(SerialParam()) 
+```
+
+Load data sheet with samples:
+
+```{r}
+samples <- read.csv(file = "data/metadata/metadata-avp25-20191003.csv",  header = T)
+samples$Treatment = factor(c(rep(c(rep("ctrl",2),rep("exp",2)),3)))
+metadata <- dba(sampleSheet = samples)
+```
+
+## QC samples, PCA. 
+
+Distance matrix of samples. Notice how the samples group my replicate.
+
+```{r}
+plot(metadata)
+```
+
+PCA of samples - just another way of displaying te same results.
+
+```{r}
+dba.plotPCA(metadata, label = DBA_REPLICATE)
+```
+
+There is quite a lot of noise in the samples, likley arising from the fact that each group of replicates where sequencd using different machines (different technologies?) and these were performed at different times. 
+
+```{r}
+save.image("RData/00_QC.RData")
+```
+

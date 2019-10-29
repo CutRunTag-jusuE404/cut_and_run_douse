@@ -1,0 +1,184 @@
+---
+title: "Count reads / diff binding"
+author: "Anna V. Protasio"
+date: "28/10/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE, echo=F, message=FALSE}
+
+require("knitr")
+knitr::opts_chunk$set(echo = F, warning=FALSE, message=FALSE, root.dir = "/Volumes/GoogleDrive/Shared drives/Douse_Protasio/git_repo/cut_and_run_douse")
+```
+
+```{r, lib_loading}
+library(RColorBrewer)
+library(DEScan2)
+library(RUVSeq)
+library(EDASeq)
+library(statmod)
+library(kableExtra)
+library(tidyr)
+library(ggplot2)
+```
+
+Count reads on consensus peaks using the function `countBamInGRanges` from package `exomeCopy`. The set of peaks to use is defined by D3 and WTT samples and is loaded from an RData object. 
+
+```{r, countFinalRegions}
+library(exomeCopy)
+ctrl_cons_pks = rtracklayer::import("output/seacr_D3_WTT_cons_peaks.bed")
+bam.files = c(list.files("../../TASOR_CutAndRun/18Feb/", full.names = T, pattern = "bam$")
+              ,list.files("../../TASOR_CutAndRun/21May/", full.names = T, pattern = "bam$"))
+keep = c(paste("F",1:4, sep=""), paste("a",1:4, sep=""), "A3","E1","B3","E2")
+b.files = c()
+for (i in 1:length(keep)) {b.files = c(b.files, bam.files[grep(keep[i],bam.files)])}
+cts = c()              
+# for (i in 1:length(b.files)) { # run once and save as it takes quite some time
+#   cts = c(cts, countBamInGRanges(b.files[i],ctrl_cons_pks, min.mapq=1, read.width=1, stranded.start=FALSE,
+#                   get.width=FALSE, remove.dup=FALSE)
+#   )
+# }
+# saveRDS(cts, "RData/countBamInGRanges_03Ruvseq.RData")
+cts = readRDS("RData/countBamInGRanges_03Ruvseq.RData")
+# build the counts matrix with defined column and row names
+cts.m = matrix(cts, ncol = length(b.files)
+               , dimnames = list(paste(seqnames(ctrl_cons_pks),ranges(ctrl_cons_pks), sep = ":"), keep))
+```
+
+The total number of peaks considered is `r dim(cts.m)[1]`
+
+```{r, RUV}
+colors <- brewer.pal(4, "Set2")
+trt <- factor(c(rep(c("D3","TKO","WTT","mutT"),2),"D3","D3","TKO","TKO"))
+colnames(cts.m) = paste(trt,1:length(colnames(cts.m)), sep=".")
+set <- betweenLaneNormalization(cts.m, which = "upper")
+```
+
+The boxplots of relative log expression (RLE = log-ratio of read count to median read count across sample) and plots of principal components (PC) reveal a clear need for between-sample normalization.
+
+```{r rawPlot, fig.width=3.5, fig.height=3.5, fig.show='hold'}
+plotRLE(set, outline = F, ylim = c(-4, 4), 
+        col = colors[trt], main = "No Normalization RLE")
+plotPCA(set, col = colors[trt], main = "No Normalization PCA", 
+        labels = T, pch = 19)
+```
+
+The parameter **k** dictates the number of factors of unwanted to variation to remove, in this case we use 3. We can see in the PCA plot that after RUVs normalization the first 2 principal components seperate the four groups indicating that the treatment is NOW the major source of variation.
+
+```{r ruv_calc, fig.width=3.5, fig.height=3.5, fig.show='hold'}
+k <- 3
+groups <- matrix(c(grep("D3", colnames(cts.m))
+                   , grep("TKO", colnames(cts.m))
+                   , c(grep("WTT", colnames(cts.m)),rep(-1,2))
+                   , c(grep("mut", colnames(cts.m)),rep(-1,2))
+                   ), nrow = 4, byrow = T)
+
+s <- RUVSeq::RUVs(set, cIdx = rownames(set), scIdx = groups, k = k)
+```
+
+```{r, ruvplot, fig.width=3.5, fig.height=3.5, fig.show='hold'}
+plotRLE(s$normalizedCounts, outline = FALSE, ylim = c(-4, 4), 
+        col = colors[trt], main = "Normalized RLE")
+plotPCA(s$normalizedCounts, col = colors[trt], main = "Normalized PCA",
+        labels = T, pch = 19)
+```
+
+
+**Testing for differential enrichment of regions.**
+
+Now, we are ready to look for differentially enriched regions, using the negative binomial quasi-likelihood GLM approach implemented in edgeR (see the edgeR package vignette for details). This is done by considering a design matrix that includes both the covariates of interest (here, the treatment status) and the factors of unwanted variation.
+
+```{r test_tko_d3}
+design <- model.matrix(~0 + trt + s$W)
+colnames(design) <- c(levels(trt), paste0("W", 1:k))
+
+y <- DGEList(counts = cts.m, group = trt)
+y <- estimateDisp(y, design)
+
+fit <- glmQLFit(y, design, robust = T) 
+
+con.tko.d3 <- makeContrasts(TKO - D3, levels = design) # ratio is TKO/D3, postive values are over represented in TKO
+qlf.tko.d3 <- glmQLFTest(fit, contrast = con.tko.d3)
+res.tko.d3 <- topTags(qlf.tko.d3, n = Inf, p.value = 0.05)
+```
+
+With a cut-off FDR < 0.05, we find the following numbers of peaks with reduced/increased binding in TKO vs D3. 
+
+```{r, table1, results= 'asis'}
+cutoff0 = c(dim(res.tko.d3[which(res.tko.d3$table$logFC < 0),])[1], dim(res.tko.d3[which(res.tko.d3$table$logFC > 0),])[1])
+cutoff1 = c(dim(res.tko.d3[which(res.tko.d3$table$logFC < -1),])[1], dim(res.tko.d3[which(res.tko.d3$table$logFC > 1),])[1])
+cutoff2 = c(dim(res.tko.d3[which(res.tko.d3$table$logFC < -2),])[1], dim(res.tko.d3[which(res.tko.d3$table$logFC > 2),])[1])
+tb = cbind(cutoff0, cutoff1, cutoff2)
+colnames(tb) = c("log2FC±0","log2FC±1", "log2FC±2")
+rownames(tb) = c("reduced","increased")
+kable(tb, "html") %>%
+  kable_styling(full_width = F)
+```
+
+Simple MA plot.
+
+```{r, plot1}
+dt = res.tko.d3$table
+dt$cutoff = cut(dt$logFC, c(-Inf, -1, 1, Inf), labels = c("< -1","-1 =< x =< 1","> 1"))
+ggplot(data = dt, mapping = aes(logCPM, logFC)) +
+  geom_point(aes(colour = dt$cutoff)) +
+  scale_colour_discrete(name  = expression(paste("Log"[2],"FC cutoff"))) +
+  labs(title = "Differential binding TKO/D3", x = "Relative Expression", y = expression(paste("Log"[2]," Fold Change")))
+```
+
+
+```{r, test_mut_d3}
+con.mut.d3 <- makeContrasts(mutT - D3, levels = design) # ratio is mut/D3, positive values are over represented in mut
+qlf.mut.d3 <- glmQLFTest(fit, contrast = con.mut.d3)
+res.mut.d3 <- topTags(qlf.mut.d3, n = Inf, p.value = 0.05)
+```
+
+With a cut-off FDR < 0.05, we find the following numbers of peaks with reduced/increased binding in mutT vs D3. 
+
+```{r, table2, results= 'asis'}
+cutoff0 = c(dim(res.mut.d3[which(res.mut.d3$table$logFC < 0),])[1], dim(res.mut.d3[which(res.mut.d3$table$logFC > 0),])[1])
+cutoff1 = c(dim(res.mut.d3[which(res.mut.d3$table$logFC < -1),])[1], dim(res.mut.d3[which(res.mut.d3$table$logFC > 1),])[1])
+cutoff2 = c(dim(res.mut.d3[which(res.mut.d3$table$logFC < -2),])[1], dim(res.mut.d3[which(res.mut.d3$table$logFC > 2),])[1])
+tb = cbind(cutoff0, cutoff1, cutoff2)
+colnames(tb) = c("log2FC±0","log2FC±1", "log2FC±2")
+rownames(tb) = c("reduced","increased")
+kable(tb, "html") %>%
+  kable_styling(full_width = F)
+```
+
+```{r, plot2}
+dt = res.mut.d3$table
+dt$cutoff = cut(dt$logFC, c(-Inf, -1, 1, Inf), labels = c("< -1","-1 =< x =< 1","> 1"))
+ggplot(data = dt, mapping = aes(logCPM, logFC)) +
+  geom_point(aes(colour = dt$cutoff)) +
+  scale_colour_discrete(name  = expression(paste("Log"[2],"FC cutoff"))) +
+  labs(title = "Differential binding mutT/D3", x = "Relative Expression", y = expression(paste("Log"[2]," Fold Change")))
+```
+
+
+```{r, test_mut_tko}
+con.mut.tko <- makeContrasts(mutT - TKO, levels = design) # ratio is mut/D3, positive values are over represented in mut
+qlf.mut.tko <- glmQLFTest(fit, contrast = con.mut.tko)
+res.mut.tko <- topTags(qlf.mut.tko, n = Inf, p.value = 0.05)
+```
+
+With a cut-off FDR < 0.05, we find the following numbers of peaks with reduced/increased binding in mutT vs TKO. (Reduced means lost in mutT with respect of TKO). There are no peaks with increased binding in mutT with respect to TKO.   
+
+```{r, table3, results= 'asis'}
+cutoff0 = c(dim(res.mut.tko[which(res.mut.tko$table$logFC < 0),])[1], dim(res.mut.tko[which(res.mut.tko$table$logFC > 0),])[1])
+cutoff1 = c(dim(res.mut.tko[which(res.mut.tko$table$logFC < -1),])[1], dim(res.mut.tko[which(res.mut.tko$table$logFC > 1),])[1])
+cutoff2 = c(dim(res.mut.tko[which(res.mut.tko$table$logFC < -2),])[1], dim(res.mut.tko[which(res.mut.tko$table$logFC > 2),])[1])
+tb = cbind(cutoff0, cutoff1, cutoff2)
+colnames(tb) = c("log2FC±0","log2FC±1", "log2FC±2")
+rownames(tb) = c("reduced","increased")
+kable(tb, "html") %>%
+  kable_styling(full_width = F)
+```
+
+
+```{r wrap_up}
+save.image("RData/03_Ruvseq_diffEnrich.RData")
+```
+
+
+

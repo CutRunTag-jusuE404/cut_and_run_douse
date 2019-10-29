@@ -1,0 +1,11 @@
+name: "Cut&Run Douse"
+output_dir: "."
+navbar:
+  title: "Anna's analysis"
+  left:
+    - text: "Intro"
+      href: index.html
+    - text: "SEACR Peaks"
+      href: 02_SEACR_peaks.html
+    - text: "RUVseq and diff enrichment"
+      href: 03_Ruvseq_diffEnrich.html

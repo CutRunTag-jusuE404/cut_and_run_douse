@@ -1,0 +1,74 @@
+---
+title: "Occupansy w/o 3 & 4"
+author: "Anna V. Protasio"
+date: "03/10/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(DiffBind)
+library(GenomicRanges)
+library(DESeq2)
+library(gdata)
+library(GWASTools)
+
+register(SerialParam())
+
+# specified the root directory for the project and is maintain throughout Notebook
+require(knitr)
+opts_knit$set(root.dir = "/Volumes/GoogleDrive/Shared drives/Douse_Protasio/git_repo/cut_and_run_douse")
+
+```
+
+##  TKO vs. D3+WTT
+```{r}
+samples <- read.csv(file="data/metadata/metadata-avp25-20191003-filter.csv", header = T)
+samples = samples[-grep("mutT",samples$Condition),]
+samples = samples[which(samples$Replicate %in% c(1,2)),]
+mdata <- dba(sampleSheet = samples)
+
+mdata1 = dba.peakset(mdata, consensus=DBA_TREATMENT, minOverlap=2)
+exp_peaks = dba.peakset(mdata, consensus=DBA_TREATMENT, minOverlap=2, bRetrieve=TRUE)
+rtracklayer::export(exp_peaks, "output/tko_vs_d3Wtt_peaks_wo3_4.bed", format = "BED")
+
+```
+
+
+### call occupancy
+
+```{r}
+mdata1_OL = dba.overlap(mdata1, mdata1$masks$Consensus)
+dba.plotVenn(mdata1, mdata1$masks$Consensus)
+# A = ctrl
+# B = exp
+
+```
+
+##  mutT vs. D3+WTT
+```{r}
+samples <- read.csv(file="data/metadata/metadata-avp25-20191003-filter.csv", header = T)
+samples = samples[-grep("TKO",samples$Condition),]
+samples = samples[which(samples$Replicate %in% c(1,2)),]
+mdata <- dba(sampleSheet = samples)
+
+mdata2 = dba.peakset(mdata, consensus=DBA_TREATMENT, minOverlap=2)
+exp_peaks = dba.peakset(mdata, consensus=DBA_TREATMENT, minOverlap=2, bRetrieve=TRUE)
+rtracklayer::export(exp_peaks, "output/mutT_vs_d3Wtt_peaks_wo3_4.bed", format = "BED")
+
+```
+
+
+### call occupancy
+
+```{r}
+mdata2_OL = dba.overlap(mdata2, mdata2$masks$Consensus)
+dba.plotVenn(mdata2, mdata2$masks$Consensus)
+# A = ctrl
+# B = exp
+
+```
+
+```{r wrapup}
+save.image("RData/03a_occupancy_wo3_4.RData")
+```
+

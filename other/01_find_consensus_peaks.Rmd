@@ -1,0 +1,108 @@
+---
+title: "Finding consensus peaks"
+author: "Anna V. Protasio"
+date: "02/10/2019"
+output:
+  html_document:
+    toc: true
+    toc_float:
+      collapsed: false
+---
+
+
+Load packages.
+
+```{r, setup, message=}
+library(DiffBind)
+library(GenomicRanges)
+library(DESeq2)
+library(gdata)
+library(GWASTools)
+
+register(SerialParam())
+
+# specified the root directory for the project and is maintain throughout Notebook
+require(knitr)
+opts_knit$set(root.dir = "/Volumes/GoogleDrive/Shared drives/Douse_Protasio/git_repo/cut_and_run_douse", echo = T, message = F, include = T)
+
+```
+
+Load data from QC step:
+
+```{r}
+load("RData/00_QC.RData")
+```
+
+Because we are expecting TASOR *TKO* and *mutT* samples to loose peaks rather then gain, we will derive a consensus peak set from the control samples *D3* and *WTT*. 
+
+```{r make_consensus_peaks}
+# retrieve consensus peaks from control samples
+ctrl_samples = samples[which(samples$Treatment == "ctrl"),]
+ctrl_mdata = dba(sampleSheet = ctrl_samples )
+ctrl_cons_pks <- dba.peakset(ctrl_mdata, minOverlap=3, bRetrieve=TRUE)
+```
+
+`ctrl_cons_pks` is GRanges object with `r length(ctrl_cons_pks)` rows.
+
+The next step is to filter out all peaks that fall in telomeres or centromeres. 
+
+```{r remove_telo_centro}
+
+telo = rtracklayer::import("data/annotation/telomeres_hg38.bed", format = "BED")
+
+# load cetromeres
+data(centromeres.hg38)
+# change the denomination of chromosomes
+centromeres.hg38$chrom = paste("chr",centromeres.hg38$chrom, sep = "")
+# make it s Grange
+cent = makeGRangesFromDataFrame(centromeres.hg38, ignore.strand=T, start.field="left.base",end.field="right.base")
+
+# produce the union of both granges
+excl = union(telo, cent)
+saveRDS(excl, file = "RData/telomere_and_centromere.RData")
+
+# exclude the telomeric and centromeric regions
+ctrl_cons_pks_clean = setdiff(ctrl_cons_pks, excl)
+rtracklayer::export(ctrl_cons_pks_clean, "output/D3_WTT_cons_peaks.bed", format = "BED")
+```
+
+This operation leave us with a reduction from `r length(ctrl_cons_pks)` to `r length(ctrl_cons_pks_clean)`.
+
+The consensus peak set has been written to `output/D3_WTT_cons_peaks.bed`. 
+
+```{r wrap-up}
+save.image("RData/01_find_consensus_peaks.RData")
+```
+
+
+<!-- #### TKO vs. ctrl - experiment 1 -->
+
+<!-- We now create a dataset that includes only the controls D3 and WTT and one experiment TKO and load the consensus peaks. The table with samples and peaks to analyse looks like: -->
+
+<!-- ```{r tko_vs_ctrl} -->
+<!-- exp1 = c("D3","TKO","WTT") -->
+<!-- exp1_samples = samples[which(samples$Condition %in% exp1),] -->
+<!-- exp1_mdata = dba(sampleSheet = exp1_samples) -->
+<!-- # load peakset -->
+<!-- exp1_mdata = dba.peakset(exp1_mdata, peaks = ctrl_cons_pks) -->
+<!-- kable(dba.show(exp1_mdata)) -->
+<!-- ``` -->
+
+<!-- Where the last line represents the consensus peak set. -->
+
+<!-- ```{r} -->
+<!-- dba.overlap(exp1_mdata, exp1_mdata$masks$exp, mode=DBA_OLAP_RATE) -->
+<!-- dba.plotVenn(exp1_mdata, exp1_mdata$masks$exp) -->
+
+<!-- exp1_count = dba.count(exp1_mdata, summits = median(width(ctrl_cons_pks))) -->
+
+
+
+<!-- ``` -->
+
+
+
+
+
+
+

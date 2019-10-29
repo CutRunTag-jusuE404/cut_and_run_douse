@@ -1,0 +1,56 @@
+---
+title: "Overlaps"
+author: "Anna V. Protasio"
+date: "28/10/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE, echo=F, message=FALSE}
+
+require("knitr")
+knitr::opts_chunk$set(echo = F, warning=FALSE, message=FALSE, root.dir = "/Volumes/GoogleDrive/Shared drives/Douse_Protasio/git_repo/cut_and_run_douse")
+```
+
+```{r, lib_loading}
+library(RColorBrewer)
+library(kableExtra)
+library(tidyr)
+library(GenomicRanges)
+```
+
+In this section, we investigate overlaps of peaks with the different genomic features. 
+
+## TKO/D3 peaks
+
+Let's look first at those peaks that are lost in TKO with respect of D3. 
+
+```{r, load_image1}
+load("RData/03_Ruvseq_diffEnrich.RData")
+
+```
+
+The total number of peaks is `r dim(cts.m)[1]` of which only `r dim(res.tko.d3$table[which(res.tko.d3$table$logFC < -1),])[1]` are lost in TKO when compared to D3 **(FDR < 0.05, Log~2~FC < -1)**. 
+
+```{r, overlap_genes}
+annot = rtracklayer::import("~/Documents/Work/REF/Annotation/gencode.v29.annotation.gtf")
+genes = annot[which(annot$type == "gene"),c(2,5:7)]
+# saveRDS(genes, "RData/genes_04.RData")
+
+tko.peaks = res.tko.d3$table[which(res.tko.d3$table$logFC < -1),]
+tko.peaks.gr = GRanges(seqnames = gsub("(chr.*):.*", "\\1", rownames(tko.peaks))
+                    , ranges = gsub("chr.*:(.*)", "\\1", rownames(tko.peaks))
+                    , strand = "*")
+mcols(tko.peaks.gr) = tko.peaks[,1:ncol(tko.peaks)]
+
+OL1 = findOverlaps(query = tko.peaks.gr, subject = genes)
+
+OL1.t = sort(table(genes[unique(subjectHits(OL1))]$gene_type))
+
+# barplot(OL1.t, las = 2, cex.names = .8)
+
+```
+
+```{r, overlap_repeats}
+reps = rtracklayer::import("~/Documents/Work/REF/Annotation/rm.dfam2.0.hg38.fa.out.my.gff")
+```
+

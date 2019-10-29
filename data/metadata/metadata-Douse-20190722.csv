@@ -1,0 +1,13 @@
+SampleID,Tissue,Condition,Replicate,bamReads,ControlID,bamControl,Peaks,PeakCaller
+D3_K9_CR9_18Feb,HeLa,D3,1,18Feb/human_F1_sort.bam,IgG_CR9_18Feb,18Feb/human_F5_sort.bam,Peaks/D3_K9_18Feb_peaks.xls,macs
+D3_K9_21May,HeLa,D3,2,21May/human_a1_sort.bam,IgG_21May,21May/human_f7_sort.bam,Peaks/D3_K9_21May_peaks.xls,macs
+TKO_K9_CR9_18Feb,HeLa,TKO,1,18Feb/human_F2_sort.bam,IgG_CR9_18Feb,18Feb/human_F5_sort.bam,Peaks/TKO_K9_CR9_18Feb_peaks.xls,macs
+TKO_K9_21May,HeLa,TKO,2,21May/human_a2_sort.bam,IgG_21May,21May/human_f7_sort.bam,Peaks/TKO_K9_21May_peaks.xls,macs
+WTT_K9_18Feb,HeLa,WTT,1,18Feb/human_F3_sort.bam,IgG_CR9_18Feb,18Feb/human_F5_sort.bam,Peaks/WTT_K9_18Feb_peaks.xls,macs
+WTT_K9_21May,HeLa,WTT,2,21May/human_a3_sort.bam,IgG_21May,21May/human_f7_sort.bam,Peaks/WTT_K9_21May_peaks.xls,macs
+mutT_K9_18Feb,HeLa,mutT,1,18Feb/human_F4_sort.bam,IgG_CR9_18Feb,18Feb/human_F5_sort.bam,Peaks/mutT_K9_18Feb_peaks.xls,macs
+mutT_K9_21May,HeLa,mutT,2,21May/human_a4_sort.bam,IgG_21May,21May/human_f7_sort.bam,Peaks/mutT_K9_21May_peaks.xls,macs
+D3_K9_CR2_18Feb,HeLa,D3,3,18Feb/human_A3_sort.bam,IgG_D3_CR2_18Feb,18Feb/human_A1_sort.bam,Peaks/D3_K9_CR2_18Feb_peaks.xls,macs
+D3_K9_CR5_18Feb,HeLa,D3,4,18Feb/human_E1_sort.bam,IgG_D3_CR2_18Feb,18Feb/human_A1_sort.bam,Peaks/D3_K9_CR5_18Feb_peaks.xls,macs
+TKO_K9_CR2_18Feb,HeLa,TKO,3,18Feb/human_B3_sort.bam,IgG_KO_CR2_18Feb,18Feb/human_B1_sort.bam,Peaks/TKO_K9_CR2_18Feb_peaks.xls,macs
+TKO_K9_CR5_18Feb,HeLa,TKO,4,18Feb/human_E2_sort.bam,IgG_KO_CR2_18Feb,18Feb/human_B1_sort.bam,Peaks/TKO_K9_CR5_18Feb_peaks.xls,macs

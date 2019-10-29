@@ -1,0 +1,122 @@
+---
+title: "SEACR peaks"
+author: "Anna V. Protasio"
+date: "03/10/2019"
+output: html_document
+---
+
+```{r, setup, echo = F, warning=FALSE, message=FALSE}
+rm(list=ls())
+
+
+# specified the root directory for the project and is maintain throughout Notebook
+require("knitr")
+knitr::opts_chunk$set(echo = F, warning=FALSE, message=FALSE, root.dir = "/Volumes/GoogleDrive/Shared drives/Douse_Protasio/git_repo/cut_and_run_douse")
+
+```
+
+```{r, libraries}
+library(DiffBind)
+library(GenomicRanges)
+library(DESeq2)
+library(gdata)
+library(GWASTools)
+library(DEScan)
+register(SerialParam())
+library(kableExtra)
+
+```
+
+## Load peak data and exclude unwanted regions
+
+The peak files have been produced using SEACR [^1]. Brifley, after peak call, peaks of less than 1000nt were excluded from the final set in the understanding that < 1kb peaks are **not** bona fide H~3~K~9~me^3^ marks.  
+
+[^1]: https://epigeneticsandchromatin.biomedcentral.com/articles/10.1186/s13072-019-0287-4
+
+Use telomere and centromere coordinates to remove these from the peak sets found by SEACR. 
+
+To obtain the coords for telomeres and centromeres I used https://genome.ucsc.edu server. *This information can be found in the "gap" database table. Use the Table Browser (https://genome.ucsc.edu/cgi-bin/hgTables) to extract it. To do this, select your assembly, in 'group' select 'All Tables', in 'tables' select 'gap', in 'filter' click 'Create' button. Set the 'type' field to 'centromere telomere' (separated by a space).* By doing this, I only managed to obtain the telomeres coordinates. Save file as BED format. 
+
+For centromeres, I use the coordinates provided in this pakcage https://www.rdocumentation.org/packages/GWASTools/versions/1.18.0; function `data(centromeres.hg38)`
+
+
+```{r, filter_excl_regions}
+excl = readRDS("RData/telomere_and_centromere.RData")
+temp = list.files("data/Peaks-seacr", full.names = T)
+mypks = lapply(temp, read.delim, header=F)
+
+mypks.gr = lapply(mypks, function(x) {makeGRangesFromDataFrame(x, ignore.strand=T, seqnames.field="V1", start.field="V2",end.field="V3")} )
+
+# remove telomere and centromere regions, plus only keep main chromosomes (those named in "excl")
+mypks.diff = lapply(mypks.gr, function(x) {setdiff(x[which(seqnames(x) %in% seqnames(excl))],excl)})
+
+```
+
+Write the new filtered peaks files to a new directory.
+
+```{r, write_clean_peaks}
+dir.create("data/Peaks-seacr-filter/")
+file.names = list.files("data/Peaks-seacr", full.names = F)
+for ( i in 1:length(mypks.diff)) {
+  rtracklayer::export(mypks.diff[[i]], paste("data/Peaks-seacr-filter/",file.names[i],sep = ""), format = "BED")
+}
+```
+
+Modify sample sheet. New sample sheet looks like:
+
+```{r, mod_sample_sheet}
+samples <- read.csv(file = "data/metadata/metadata-avp25-20191003.csv",  header = T)
+samples$Peaks = gsub("Peaks-seacr","Peaks-seacr-filter",samples$Peaks)
+samples$Treatment = factor(c(rep(c(rep("ctrl",2),rep("exp",2)),3)))
+write.csv(samples, file = "data/metadata/metadata-avp25-20191003-filter.csv")
+dt = samples[,-c(5:7)]
+kable(dt) %>%
+  kable_styling(bootstrap_options = "striped", full_width = F)
+```
+
+Use clean set of SEACR peaks to find a consensus set of peaks based on the ctrl samples (D3 and WTT)
+
+```{r, make_cons_peaks_ctrl}
+# retrieve consensus peaks from control samples
+ctrl_samples = samples[which(samples$Treatment == "ctrl"),]
+ctrl_mdata = dba(sampleSheet = ctrl_samples )
+ctrl_olap.rate <- dba.overlap(ctrl_mdata, mode=DBA_OLAP_RATE)
+```
+
+```{r, retrieve_peaks}
+# retrieve peak set with
+ctrl_cons_pks <- dba.peakset(ctrl_mdata, minOverlap=2, bRetrieve=TRUE)  # minOverlap NOT WORKING
+rtracklayer::export(ctrl_cons_pks, "output/seacr_D3_WTT_cons_peaks.bed", format = "BED")
+```
+
+The following plots shows the number of peaks for the control samples (D3 plus WTT) and the overlap rate. We make use of some of the practical functionalities of the `R package DiffBind` to find the consensus peaks based on their coordinates overlap. 
+
+[^2]: https://bioconductor.org/packages/release/bioc/html/DiffBind.html
+
+```{r, plot_olap_ctrl}
+plot(ctrl_olap.rate,type='b',ylab='# peaks', xlab='Overlap at least this many peaksets', main = "control samples (D3 + WTT)")
+text(1:length(ctrl_olap.rate),ctrl_olap.rate[1:length(ctrl_olap.rate)], labels = ctrl_olap.rate[1:length(ctrl_olap.rate)], adj =0 , pos = 1 )
+```
+
+```{r, make_cons_peaks_d3}
+# retrieve consensus peaks from control samples
+d3_samples = samples[which(samples$Condition == "D3"),]
+d3_mdata = dba(sampleSheet = d3_samples )
+d3_olap.rate <- dba.overlap(d3_mdata, mode=DBA_OLAP_RATE)
+d3_cons_pks <- dba.peakset(d3_mdata, minOverlap=2, bRetrieve=TRUE) # minOverlap NOT WORKING
+rtracklayer::export(d3_cons_pks, "output/seacr_D3_cons_peaks.bed", format = "BED")
+```
+
+```{r, plot_olap_d3}
+plot(d3_olap.rate, type='b',ylab='# peaks', xlab='Overlap at least this many peaksets', main = "D3 samples only")
+text(1:length(d3_olap.rate),d3_olap.rate[1:length(d3_olap.rate)], labels = d3_olap.rate[1:length(d3_olap.rate)]
+     , adj =0 , pos = 1)
+```
+
+
+Ideally, the number of peaks should plato as the number of overlaps increases. This is not the case for these samples probably because there is much variation among samples. Therefore, we proceed with a permissive set of peak as we will only focus on those that that are differentially enriched/bound.
+
+```{r, wrap_up}
+save.image("RData/02_SEACR_peaks.RData")
+```
+
