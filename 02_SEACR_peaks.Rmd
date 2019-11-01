@@ -98,7 +98,7 @@ The following plots shows the number of peaks for the control samples (D3 plus W
 [^2]: https://bioconductor.org/packages/release/bioc/html/DiffBind.html
 
 ```{r, plot_olap_ctrl}
-plot(ctrl_olap.rate,type='b',ylab='# peaks', xlab='Overlap at least this many peaksets', main = "control samples (D3 + WTT)")
+plot(ctrl_olap.rate,type='b',ylab='# peaks', xlab='Overlap at least this many samples', main = "control samples (D3 + WTT)")
 text(1:length(ctrl_olap.rate),ctrl_olap.rate[1:length(ctrl_olap.rate)], labels = ctrl_olap.rate[1:length(ctrl_olap.rate)], adj =0 , pos = 1 )
 ```
 
@@ -112,7 +112,7 @@ rtracklayer::export(d3_cons_pks, "output/seacr_D3_cons_peaks.bed", format = "BED
 ```
 
 ```{r, plot_olap_d3}
-plot(d3_olap.rate, type='b',ylab='# peaks', xlab='Overlap at least this many peaksets', main = "D3 samples only")
+plot(d3_olap.rate, type='b',ylab='# peaks', xlab='Overlap at least this many samples', main = "D3 samples only")
 text(1:length(d3_olap.rate),d3_olap.rate[1:length(d3_olap.rate)], labels = d3_olap.rate[1:length(d3_olap.rate)]
      , adj =0 , pos = 1)
 ```
