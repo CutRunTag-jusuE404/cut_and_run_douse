@@ -2,10 +2,15 @@
 title: "Count reads / diff binding"
 author: "Anna V. Protasio"
 date: "28/10/2019"
-output: html_document
+output:
+  html_document:
+    toc: true
+    toc_float:
+      collapsed: false
 ---
 
 ```{r setup, include=FALSE, echo=F, message=FALSE}
+rm(list=ls())
 
 require("knitr")
 knitr::opts_chunk$set(echo = F, warning=FALSE, message=FALSE, root.dir = "/Volumes/GoogleDrive/Shared drives/Douse_Protasio/git_repo/cut_and_run_douse")
@@ -43,6 +48,7 @@ cts = readRDS("RData/countBamInGRanges_03Ruvseq.RData")
 # build the counts matrix with defined column and row names
 cts.m = matrix(cts, ncol = length(b.files)
                , dimnames = list(paste(seqnames(ctrl_cons_pks),ranges(ctrl_cons_pks), sep = ":"), keep))
+rm(cts)
 ```
 
 The total number of peaks considered is `r dim(cts.m)[1]`
@@ -84,11 +90,11 @@ plotPCA(s$normalizedCounts, col = colors[trt], main = "Normalized PCA",
 ```
 
 
-**Testing for differential enrichment of regions.**
+# Testing for differential enrichment of regions
 
 Now, we are ready to look for differentially enriched regions, using the negative binomial quasi-likelihood GLM approach implemented in edgeR (see the edgeR package vignette for details). This is done by considering a design matrix that includes both the covariates of interest (here, the treatment status) and the factors of unwanted variation.
 
-```{r test_tko_d3}
+```{r, glmQLFit}
 design <- model.matrix(~0 + trt + s$W)
 colnames(design) <- c(levels(trt), paste0("W", 1:k))
 
@@ -97,9 +103,14 @@ y <- estimateDisp(y, design)
 
 fit <- glmQLFit(y, design, robust = T) 
 
+```
+
+## TKO vs D3
+
+```{r, test_tko_d3}
 con.tko.d3 <- makeContrasts(TKO - D3, levels = design) # ratio is TKO/D3, postive values are over represented in TKO
-qlf.tko.d3 <- glmQLFTest(fit, contrast = con.tko.d3)
-res.tko.d3 <- topTags(qlf.tko.d3, n = Inf, p.value = 0.05)
+res.tko.d3 <- topTags( glmQLFTest(fit, contrast = con.tko.d3) , n = Inf, p.value = 0.05)
+
 ```
 
 With a cut-off FDR < 0.05, we find the following numbers of peaks with reduced/increased binding in TKO vs D3. 
@@ -126,12 +137,13 @@ ggplot(data = dt, mapping = aes(logCPM, logFC)) +
   labs(title = "Differential binding TKO/D3", x = "Relative Expression", y = expression(paste("Log"[2]," Fold Change")))
 ```
 
+## mutT vd D3
 
 ```{r, test_mut_d3}
 con.mut.d3 <- makeContrasts(mutT - D3, levels = design) # ratio is mut/D3, positive values are over represented in mut
-qlf.mut.d3 <- glmQLFTest(fit, contrast = con.mut.d3)
-res.mut.d3 <- topTags(qlf.mut.d3, n = Inf, p.value = 0.05)
+res.mut.d3 <- topTags(glmQLFTest(fit, contrast = con.mut.d3), n = Inf, p.value = 0.05)
 ```
+
 
 With a cut-off FDR < 0.05, we find the following numbers of peaks with reduced/increased binding in mutT vs D3. 
 
@@ -155,12 +167,13 @@ ggplot(data = dt, mapping = aes(logCPM, logFC)) +
   labs(title = "Differential binding mutT/D3", x = "Relative Expression", y = expression(paste("Log"[2]," Fold Change")))
 ```
 
+## mutT vs TKO
 
 ```{r, test_mut_tko}
 con.mut.tko <- makeContrasts(mutT - TKO, levels = design) # ratio is mut/D3, positive values are over represented in mut
-qlf.mut.tko <- glmQLFTest(fit, contrast = con.mut.tko)
-res.mut.tko <- topTags(qlf.mut.tko, n = Inf, p.value = 0.05)
+res.mut.tko <- topTags( glmQLFTest(fit, contrast = con.mut.tko) , n = Inf, p.value = 0.05)
 ```
+
 
 With a cut-off FDR < 0.05, we find the following numbers of peaks with reduced/increased binding in mutT vs TKO. (Reduced means lost in mutT with respect of TKO). There are no peaks with increased binding in mutT with respect to TKO.   
 
@@ -175,8 +188,42 @@ kable(tb, "html") %>%
   kable_styling(full_width = F)
 ```
 
+## mutT vs WTT
+
+```{r, test_mut_wtt}
+con.mut.wtt <- makeContrasts(mutT - WTT, levels = design) # ratio is mut/wtt, postive values are over represented in mut
+res.mut.wtt <- topTags( glmQLFTest(fit, contrast = con.mut.wtt) , n = Inf, p.value = 0.05)
+
+```
+
+With a cut-off FDR < 0.05, we find the following numbers of peaks with reduced/increased binding in mut vs wtt. 
+
+```{r, table4, results= 'asis'}
+cutoff0 = c(dim(res.mut.wtt[which(res.mut.wtt$table$logFC < 0),])[1], dim(res.mut.wtt[which(res.mut.wtt$table$logFC > 0),])[1])
+cutoff1 = c(dim(res.mut.wtt[which(res.mut.wtt$table$logFC < -1),])[1], dim(res.mut.wtt[which(res.mut.wtt$table$logFC > 1),])[1])
+cutoff2 = c(dim(res.mut.wtt[which(res.mut.wtt$table$logFC < -2),])[1], dim(res.mut.wtt[which(res.mut.wtt$table$logFC > 2),])[1])
+tb = cbind(cutoff0, cutoff1, cutoff2)
+colnames(tb) = c("log2FC±0","log2FC±1", "log2FC±2")
+rownames(tb) = c("reduced","increased")
+kable(tb, "html") %>%
+  kable_styling(full_width = F)
+```
+
+Simple MA plot.
+
+```{r, plot4}
+dt = res.mut.wtt$table
+dt$cutoff = cut(dt$logFC, c(-Inf, -1, 1, Inf), labels = c("< -1","-1 =< x =< 1","> 1"))
+ggplot(data = dt, mapping = aes(logCPM, logFC)) +
+  geom_point(aes(colour = dt$cutoff)) +
+  scale_colour_discrete(name  = expression(paste("Log"[2],"FC cutoff"))) +
+  labs(title = "Differential binding mut/wtt", x = "Relative Expression", y = expression(paste("Log"[2]," Fold Change")))
+```
+
+
 
 ```{r wrap_up}
+rm(s,set,y, ctrl_cons_pks)
 save.image("RData/03_Ruvseq_diffEnrich.RData")
 ```
 

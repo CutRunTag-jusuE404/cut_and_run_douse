@@ -21,6 +21,9 @@
 <script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
 <link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
@@ -250,6 +253,69 @@ $(document).ready(function () {
 
 
 
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+.tocify-subheader {
+  display: inline;
+}
+.tocify-subheader .tocify-item {
+  font-size: 0.95em;
+}
+
+</style>
+
+
 
 </head>
 
@@ -257,6 +323,16 @@ $(document).ready(function () {
 
 
 <div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
 
 
 
@@ -281,6 +357,9 @@ $(document).ready(function () {
 </li>
 <li>
   <a href="03_Ruvseq_diffEnrich.html">RUVseq and diff enrichment</a>
+</li>
+<li>
+  <a href="04_overlaps.html">Overlaps</a>
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
@@ -307,8 +386,11 @@ $(document).ready(function () {
 <p><img src="03_Ruvseq_diffEnrich_files/figure-html/rawPlot-1.png" width="336" /><img src="03_Ruvseq_diffEnrich_files/figure-html/rawPlot-2.png" width="336" /></p>
 <p>The parameter <strong>k</strong> dictates the number of factors of unwanted to variation to remove, in this case we use 3. We can see in the PCA plot that after RUVs normalization the first 2 principal components seperate the four groups indicating that the treatment is NOW the major source of variation.</p>
 <p><img src="03_Ruvseq_diffEnrich_files/figure-html/ruvplot-1.png" width="336" /><img src="03_Ruvseq_diffEnrich_files/figure-html/ruvplot-2.png" width="336" /></p>
-<p><strong>Testing for differential enrichment of regions.</strong></p>
+<div id="testing-for-differential-enrichment-of-regions" class="section level1">
+<h1>Testing for differential enrichment of regions</h1>
 <p>Now, we are ready to look for differentially enriched regions, using the negative binomial quasi-likelihood GLM approach implemented in edgeR (see the edgeR package vignette for details). This is done by considering a design matrix that includes both the covariates of interest (here, the treatment status) and the factors of unwanted variation.</p>
+<div id="tko-vs-d3" class="section level2">
+<h2>TKO vs D3</h2>
 <p>With a cut-off FDR &lt; 0.05, we find the following numbers of peaks with reduced/increased binding in TKO vs D3.</p>
 <table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
 <thead>
@@ -359,6 +441,9 @@ increased
 </table>
 <p>Simple MA plot.</p>
 <p><img src="03_Ruvseq_diffEnrich_files/figure-html/plot1-1.png" width="672" /></p>
+</div>
+<div id="mutt-vd-d3" class="section level2">
+<h2>mutT vd D3</h2>
 <p>With a cut-off FDR &lt; 0.05, we find the following numbers of peaks with reduced/increased binding in mutT vs D3.</p>
 <table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
 <thead>
@@ -408,6 +493,9 @@ increased
 </tbody>
 </table>
 <p><img src="03_Ruvseq_diffEnrich_files/figure-html/plot2-1.png" width="672" /></p>
+</div>
+<div id="mutt-vs-tko" class="section level2">
+<h2>mutT vs TKO</h2>
 <p>With a cut-off FDR &lt; 0.05, we find the following numbers of peaks with reduced/increased binding in mutT vs TKO. (Reduced means lost in mutT with respect of TKO). There are no peaks with increased binding in mutT with respect to TKO.</p>
 <table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
 <thead>
@@ -456,9 +544,66 @@ increased
 </tr>
 </tbody>
 </table>
+</div>
+<div id="mutt-vs-wtt" class="section level2">
+<h2>mutT vs WTT</h2>
+<p>With a cut-off FDR &lt; 0.05, we find the following numbers of peaks with reduced/increased binding in mut vs wtt.</p>
+<table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:right;">
+log2FC±0
+</th>
+<th style="text-align:right;">
+log2FC±1
+</th>
+<th style="text-align:right;">
+log2FC±2
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+reduced
+</td>
+<td style="text-align:right;">
+373
+</td>
+<td style="text-align:right;">
+238
+</td>
+<td style="text-align:right;">
+46
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+increased
+</td>
+<td style="text-align:right;">
+7
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+</tbody>
+</table>
+<p>Simple MA plot.</p>
+<p><img src="03_Ruvseq_diffEnrich_files/figure-html/plot4-1.png" width="672" /></p>
+</div>
+</div>
 
 
 
+</div>
+</div>
 
 </div>
 
@@ -491,6 +636,32 @@ $(document).ready(function () {
 
 <!-- code folding -->
 
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = false;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
 
 <!-- dynamically load mathjax for compatibility with self-contained -->
 <script>

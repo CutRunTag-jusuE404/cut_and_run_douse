@@ -2,7 +2,11 @@
 title: "SEACR peaks"
 author: "Anna V. Protasio"
 date: "03/10/2019"
-output: html_document
+output:
+  html_document:
+    toc: true
+    toc_float:
+      collapsed: false
 ---
 
 ```{r, setup, echo = F, warning=FALSE, message=FALSE}
@@ -117,6 +121,7 @@ text(1:length(d3_olap.rate),d3_olap.rate[1:length(d3_olap.rate)], labels = d3_ol
 Ideally, the number of peaks should plato as the number of overlaps increases. This is not the case for these samples probably because there is much variation among samples. Therefore, we proceed with a permissive set of peak as we will only focus on those that that are differentially enriched/bound.
 
 ```{r, wrap_up}
+rm(mypks, ctrl_mdata, d3_mdata)
 save.image("RData/02_SEACR_peaks.RData")
 ```
 

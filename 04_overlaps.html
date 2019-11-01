@@ -21,9 +21,13 @@
 <script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
 <link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<script src="site_libs/kePrint-0.0.1/kePrint.js"></script>
 
 <style type="text/css">code{white-space: pre;}</style>
 <style type="text/css">
@@ -249,6 +253,69 @@ $(document).ready(function () {
 
 
 
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+.tocify-subheader {
+  display: inline;
+}
+.tocify-subheader .tocify-item {
+  font-size: 0.95em;
+}
+
+</style>
+
+
 
 </head>
 
@@ -256,6 +323,16 @@ $(document).ready(function () {
 
 
 <div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
 
 
 
@@ -280,6 +357,9 @@ $(document).ready(function () {
 </li>
 <li>
   <a href="03_Ruvseq_diffEnrich.html">RUVseq and diff enrichment</a>
+</li>
+<li>
+  <a href="04_overlaps.html">Overlaps</a>
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
@@ -306,9 +386,5657 @@ $(document).ready(function () {
 <p>Let’s look first at those peaks that are lost in TKO with respect of D3.</p>
 <p>The total number of peaks is 41215 of which only 393 are lost in TKO when compared to D3 <strong>(FDR &lt; 0.05, Log<sub>2</sub>FC &lt; -1)</strong>.</p>
 </div>
+<div id="overlap-with-gene-features-a.k.a-genes" class="section level2">
+<h2>Overlap with gene features (a.k.a genes)</h2>
+<p>A summary barplot is shown below, the categories are somehow selected for:</p>
+<table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Var1
+</th>
+<th style="text-align:right;">
+Freq
+</th>
+<th style="text-align:left;">
+type
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+miRNA
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+smallRNA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+snoRNA
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+smallRNA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+bidirectional_promoter_lncRNA
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:left;">
+lncRNA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+snRNA
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:left;">
+smallRNA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+TEC
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:left;">
+other
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+transcribed_unitary_pseudogene
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:left;">
+pseudo
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+unprocessed_pseudogene
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:left;">
+pseudo
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+transcribed_processed_pseudogene
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:left;">
+pseudo
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+sense_overlapping
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:left;">
+other
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+misc_RNA
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:left;">
+other
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+sense_intronic
+</td>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:left;">
+other
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+processed_pseudogene
+</td>
+<td style="text-align:right;">
+7
+</td>
+<td style="text-align:left;">
+pseudo
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+processed_transcript
+</td>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:left;">
+other
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+transcribed_unprocessed_pseudogene
+</td>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:left;">
+pseudo
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+antisense
+</td>
+<td style="text-align:right;">
+22
+</td>
+<td style="text-align:left;">
+other
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+lincRNA
+</td>
+<td style="text-align:right;">
+33
+</td>
+<td style="text-align:left;">
+lncRNA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+protein_coding
+</td>
+<td style="text-align:right;">
+238
+</td>
+<td style="text-align:left;">
+coding
+</td>
+</tr>
+</tbody>
+</table>
+<p><img src="04_overlaps_files/figure-html/barplot1-1.png" width="480" /></p>
+<p>Among the protein coding genes, there are 46 ZNF genes (of a total of 646 annotated in the genome).</p>
+<p>Testing for enrichment of ZNFs in peaks.</p>
+<pre><code>##          ZNF no.ZNF
+## yes.peak  46    304
+## no.peak  469  19425</code></pre>
+<p>We apply Fisher Exact test where the H<sub>0</sub> is that the proportion of ZNFs found in peaks is the same as the proportion found in the general pool of genes vs the alternative H<sub>A</sub> which states that the proportion of ZNFs in peaks is greater than that of the general pool of genes.</p>
+<pre><code>## 
+##  Fisher&#39;s Exact Test for Count Data
+## 
+## data:  contingency.table
+## p-value &lt; 2.2e-16
+## alternative hypothesis: true odds ratio is greater than 1
+## 95 percent confidence interval:
+##  4.685079      Inf
+## sample estimates:
+## odds ratio 
+##   6.265804</code></pre>
+<p>The P-value indicates that we reject the H<sub>0</sub> in the favor of H<sub>A</sub>.</p>
+<div id="protein-coding-overlaping-peaks" class="section level3">
+<h3>Protein coding overlaping peaks</h3>
+<table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:left;">
+seqnames
+</th>
+<th style="text-align:right;">
+start
+</th>
+<th style="text-align:right;">
+end
+</th>
+<th style="text-align:left;">
+gene_id
+</th>
+<th style="text-align:left;">
+gene_name
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+204
+</td>
+<td style="text-align:left;">
+chr3
+</td>
+<td style="text-align:right;">
+100749156
+</td>
+<td style="text-align:right;">
+100993515
+</td>
+<td style="text-align:left;">
+ENSG00000154175.16
+</td>
+<td style="text-align:left;">
+ABI3BP
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+14
+</td>
+<td style="text-align:left;">
+chr7
+</td>
+<td style="text-align:right;">
+92131774
+</td>
+<td style="text-align:right;">
+92245924
+</td>
+<td style="text-align:left;">
+ENSG00000285953.1
+</td>
+<td style="text-align:left;">
+AC000120.3
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+226
+</td>
+<td style="text-align:left;">
+chr19
+</td>
+<td style="text-align:right;">
+57487718
+</td>
+<td style="text-align:right;">
+57505381
+</td>
+<td style="text-align:left;">
+ENSG00000268107.5
+</td>
+<td style="text-align:left;">
+AC003005.1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+111
+</td>
+<td style="text-align:left;">
+chr19
+</td>
+<td style="text-align:right;">
+57682045
+</td>
+<td style="text-align:right;">
+57753575
+</td>
+<td style="text-align:left;">
+ENSG00000269026.2
+</td>
+<td style="text-align:left;">
+AC003006.1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+46
+</td>
+<td style="text-align:left;">
+chr19
+</td>
+<td style="text-align:right;">
+57437970
+</td>
+<td style="text-align:right;">
+57477536
+</td>
+<td style="text-align:left;">
+ENSG00000268163.1
+</td>
+<td style="text-align:left;">
+AC004076.1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+210
+</td>
+<td style="text-align:left;">
+chr12
+</td>
+<td style="text-align:right;">
+4649101
+</td>
+<td style="text-align:right;">
+4774184
+</td>
+<td style="text-align:left;">
+ENSG00000255639.3
+</td>
+<td style="text-align:left;">
+AC005833.1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+84
+</td>
+<td style="text-align:left;">
+chr12
+</td>
+<td style="text-align:right;">
+4273762
+</td>
+<td style="text-align:right;">
+4405490
+</td>
+<td style="text-align:left;">
+ENSG00000285901.1
+</td>
+<td style="text-align:left;">
+AC008012.1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+162
+</td>
+<td style="text-align:left;">
+chr19
+</td>
+<td style="text-align:right;">
+57876765
+</td>
+<td style="text-align:right;">
+57916591
+</td>
+<td style="text-align:left;">
+ENSG00000269476.1
+</td>
+<td style="text-align:left;">
+AC010326.2
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+32
+</td>
+<td style="text-align:left;">
+chr19
+</td>
+<td style="text-align:right;">
+52880663
+</td>
+<td style="text-align:right;">
+52962768
+</td>
+<td style="text-align:left;">
+ENSG00000283088.1
+</td>
+<td style="text-align:left;">
+AC010487.3
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+148
+</td>
+<td style="text-align:left;">
+chr16
+</td>
+<td style="text-align:right;">
+71447600
+</td>
+<td style="text-align:right;">
+71489311
+</td>
+<td style="text-align:left;">
+ENSG00000261611.6
+</td>
+<td style="text-align:left;">
+AC010547.4
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+120
+</td>
+<td style="text-align:left;">
+chr3
+</td>
+<td style="text-align:right;">
+28349178
+</td>
+<td style="text-align:right;">
+29767537
+</td>
+<td style="text-align:left;">
+ENSG00000283563.1
+</td>
+<td style="text-align:left;">
+AC098650.1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+49
+</td>
+<td style="text-align:left;">
+chr3
+</td>
+<td style="text-align:right;">
+113361901
+</td>
+<td style="text-align:right;">
+113515151
+</td>
+<td style="text-align:left;">
+ENSG00000285943.1
+</td>
+<td style="text-align:left;">
+AC112128.1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+149
+</td>
+<td style="text-align:left;">
+chr1
+</td>
+<td style="text-align:right;">
+75724347
+</td>
+<td style="text-align:right;">
+75787575
+</td>
+<td style="text-align:left;">
+ENSG00000117054.13
+</td>
+<td style="text-align:left;">
+ACADM
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+65
+</td>
+<td style="text-align:left;">
+chr6
+</td>
+<td style="text-align:right;">
+135283532
+</td>
+<td style="text-align:right;">
+135497776
+</td>
+<td style="text-align:left;">
+ENSG00000135541.20
+</td>
+<td style="text-align:left;">
+AHI1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+12
+</td>
+<td style="text-align:left;">
+chr10
+</td>
+<td style="text-align:right;">
+38094368
+</td>
+<td style="text-align:right;">
+38360098
+</td>
+<td style="text-align:left;">
+ENSG00000283930.1
+</td>
+<td style="text-align:left;">
+AL117339.5
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+5
+</td>
+<td style="text-align:left;">
+chr9
+</td>
+<td style="text-align:right;">
+21802636
+</td>
+<td style="text-align:right;">
+22032986
+</td>
+<td style="text-align:left;">
+ENSG00000264545.1
+</td>
+<td style="text-align:left;">
+AL359922.1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+70
+</td>
+<td style="text-align:left;">
+chr2
+</td>
+<td style="text-align:right;">
+73385758
+</td>
+<td style="text-align:right;">
+73610793
+</td>
+<td style="text-align:left;">
+ENSG00000116127.17
+</td>
+<td style="text-align:left;">
+ALMS1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+130
+</td>
+<td style="text-align:left;">
+chr2
+</td>
+<td style="text-align:right;">
+201288271
+</td>
+<td style="text-align:right;">
+201357398
+</td>
+<td style="text-align:left;">
+ENSG00000155749.12
+</td>
+<td style="text-align:left;">
+ALS2CR12
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+200
+</td>
+<td style="text-align:left;">
+chr5
+</td>
+<td style="text-align:right;">
+140401814
+</td>
+<td style="text-align:right;">
+140539856
+</td>
+<td style="text-align:left;">
+ENSG00000131503.20
+</td>
+<td style="text-align:left;">
+ANKHD1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+201
+</td>
+<td style="text-align:left;">
+chr5
+</td>
+<td style="text-align:right;">
+140401908
+</td>
+<td style="text-align:right;">
+140549569
+</td>
+<td style="text-align:left;">
+ENSG00000254996.5
+</td>
+<td style="text-align:left;">
+ANKHD1-EIF4EBP3
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+176
+</td>
+<td style="text-align:left;">
+chr7
+</td>
+<td style="text-align:right;">
+92246234
+</td>
+<td style="text-align:right;">
+92401384
+</td>
+<td style="text-align:left;">
+ENSG00000001629.9
+</td>
+<td style="text-align:left;">
+ANKIB1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+114
+</td>
+<td style="text-align:left;">
+chr18
+</td>
+<td style="text-align:right;">
+9136228
+</td>
+<td style="text-align:right;">
+9285985
+</td>
+<td style="text-align:left;">
+ENSG00000101745.16
+</td>
+<td style="text-align:left;">
+ANKRD12
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+68
+</td>
+<td style="text-align:left;">
+chr17
+</td>
+<td style="text-align:right;">
+60443149
+</td>
+<td style="text-align:right;">
+60526219
+</td>
+<td style="text-align:left;">
+ENSG00000062725.9
+</td>
+<td style="text-align:left;">
+APPBP2
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+219
+</td>
+<td style="text-align:left;">
+chr12
+</td>
+<td style="text-align:right;">
+105173296
+</td>
+<td style="text-align:right;">
+105236238
+</td>
+<td style="text-align:left;">
+ENSG00000136044.11
+</td>
+<td style="text-align:left;">
+APPL2
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+193
+</td>
+<td style="text-align:left;">
+chr4
+</td>
+<td style="text-align:right;">
+152779937
+</td>
+<td style="text-align:right;">
+152918463
+</td>
+<td style="text-align:left;">
+ENSG00000164144.15
+</td>
+<td style="text-align:left;">
+ARFIP1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+207
+</td>
+<td style="text-align:left;">
+chr10
+</td>
+<td style="text-align:right;">
+50739318
+</td>
+<td style="text-align:right;">
+50816495
+</td>
+<td style="text-align:left;">
+ENSG00000204147.10
+</td>
+<td style="text-align:left;">
+ASAH2B
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+175
+</td>
+<td style="text-align:left;">
+chr1
+</td>
+<td style="text-align:right;">
+197084128
+</td>
+<td style="text-align:right;">
+197146694
+</td>
+<td style="text-align:left;">
+ENSG00000066279.17
+</td>
+<td style="text-align:left;">
+ASPM
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+218
+</td>
+<td style="text-align:left;">
+chr5
+</td>
+<td style="text-align:right;">
+81972025
+</td>
+<td style="text-align:right;">
+82276857
+</td>
+<td style="text-align:left;">
+ENSG00000152348.15
+</td>
+<td style="text-align:left;">
+ATG10
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+213
+</td>
+<td style="text-align:left;">
+chr11
+</td>
+<td style="text-align:right;">
+108222484
+</td>
+<td style="text-align:right;">
+108369102
+</td>
+<td style="text-align:left;">
+ENSG00000149311.18
+</td>
+<td style="text-align:left;">
+ATM
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+63
+</td>
+<td style="text-align:left;">
+chr3
+</td>
+<td style="text-align:right;">
+142449235
+</td>
+<td style="text-align:right;">
+142578826
+</td>
+<td style="text-align:left;">
+ENSG00000175054.14
+</td>
+<td style="text-align:left;">
+ATR
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+27
+</td>
+<td style="text-align:left;">
+chr17
+</td>
+<td style="text-align:right;">
+82942155
+</td>
+<td style="text-align:right;">
+83051810
+</td>
+<td style="text-align:left;">
+ENSG00000175711.8
+</td>
+<td style="text-align:left;">
+B3GNTL1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+77
+</td>
+<td style="text-align:left;">
+chr11
+</td>
+<td style="text-align:right;">
+27654893
+</td>
+<td style="text-align:right;">
+27722058
+</td>
+<td style="text-align:left;">
+ENSG00000176697.18
+</td>
+<td style="text-align:left;">
+BDNF
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+31
+</td>
+<td style="text-align:left;">
+chr13
+</td>
+<td style="text-align:right;">
+32315474
+</td>
+<td style="text-align:right;">
+32400266
+</td>
+<td style="text-align:left;">
+ENSG00000139618.14
+</td>
+<td style="text-align:left;">
+BRCA2
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+214
+</td>
+<td style="text-align:left;">
+chr11
+</td>
+<td style="text-align:right;">
+108308519
+</td>
+<td style="text-align:right;">
+108467531
+</td>
+<td style="text-align:left;">
+ENSG00000166323.12
+</td>
+<td style="text-align:left;">
+C11orf65
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+55
+</td>
+<td style="text-align:left;">
+chr2
+</td>
+<td style="text-align:right;">
+27537386
+</td>
+<td style="text-align:right;">
+27582721
+</td>
+<td style="text-align:left;">
+ENSG00000221843.4
+</td>
+<td style="text-align:left;">
+C2orf16
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+234
+</td>
+<td style="text-align:left;">
+chr2
+</td>
+<td style="text-align:right;">
+189879609
+</td>
+<td style="text-align:right;">
+190203484
+</td>
+<td style="text-align:left;">
+ENSG00000187699.10
+</td>
+<td style="text-align:left;">
+C2orf88
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+25
+</td>
+<td style="text-align:left;">
+chr15
+</td>
+<td style="text-align:right;">
+44288729
+</td>
+<td style="text-align:right;">
+44415758
+</td>
+<td style="text-align:left;">
+ENSG00000166734.19
+</td>
+<td style="text-align:left;">
+CASC4
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+71
+</td>
+<td style="text-align:left;">
+chr4
+</td>
+<td style="text-align:right;">
+168863770
+</td>
+<td style="text-align:right;">
+169010275
+</td>
+<td style="text-align:left;">
+ENSG00000145439.11
+</td>
+<td style="text-align:left;">
+CBR4
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+50
+</td>
+<td style="text-align:left;">
+chr2
+</td>
+<td style="text-align:right;">
+113437691
+</td>
+<td style="text-align:right;">
+113496189
+</td>
+<td style="text-align:left;">
+ENSG00000136682.14
+</td>
+<td style="text-align:left;">
+CBWD2
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+184
+</td>
+<td style="text-align:left;">
+chr9
+</td>
+<td style="text-align:right;">
+68232003
+</td>
+<td style="text-align:right;">
+68300015
+</td>
+<td style="text-align:left;">
+ENSG00000196873.15
+</td>
+<td style="text-align:left;">
+CBWD3
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+183
+</td>
+<td style="text-align:left;">
+chr2
+</td>
+<td style="text-align:right;">
+196639554
+</td>
+<td style="text-align:right;">
+196763490
+</td>
+<td style="text-align:left;">
+ENSG00000144395.17
+</td>
+<td style="text-align:left;">
+CCDC150
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+165
+</td>
+<td style="text-align:left;">
+chr13
+</td>
+<td style="text-align:right;">
+102729369
+</td>
+<td style="text-align:right;">
+102759070
+</td>
+<td style="text-align:left;">
+ENSG00000175820.3
+</td>
+<td style="text-align:left;">
+CCDC168
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+129
+</td>
+<td style="text-align:left;">
+chr1
+</td>
+<td style="text-align:right;">
+93179919
+</td>
+<td style="text-align:right;">
+93278730
+</td>
+<td style="text-align:left;">
+ENSG00000122483.17
+</td>
+<td style="text-align:left;">
+CCDC18
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+151
+</td>
+<td style="text-align:left;">
+chr1
+</td>
+<td style="text-align:right;">
+169394870
+</td>
+<td style="text-align:right;">
+169460669
+</td>
+<td style="text-align:left;">
+ENSG00000117477.12
+</td>
+<td style="text-align:left;">
+CCDC181
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+230
+</td>
+<td style="text-align:left;">
+chr10
+</td>
+<td style="text-align:right;">
+32446140
+</td>
+<td style="text-align:right;">
+32882874
+</td>
+<td style="text-align:left;">
+ENSG00000216937.13
+</td>
+<td style="text-align:left;">
+CCDC7
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+194
+</td>
+<td style="text-align:left;">
+chr11
+</td>
+<td style="text-align:right;">
+96352769
+</td>
+<td style="text-align:right;">
+96389956
+</td>
+<td style="text-align:left;">
+ENSG00000149231.13
+</td>
+<td style="text-align:left;">
+CCDC82
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+66
+</td>
+<td style="text-align:left;">
+chr5
+</td>
+<td style="text-align:right;">
+134286350
+</td>
+<td style="text-align:right;">
+134371047
+</td>
+<td style="text-align:left;">
+ENSG00000006837.11
+</td>
+<td style="text-align:left;">
+CDKL3
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+171
+</td>
+<td style="text-align:left;">
+chr2
+</td>
+<td style="text-align:right;">
+37201612
+</td>
+<td style="text-align:right;">
+37231713
+</td>
+<td style="text-align:left;">
+ENSG00000115816.14
+</td>
+<td style="text-align:left;">
+CEBPZ
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+170
+</td>
+<td style="text-align:left;">
+chr2
+</td>
+<td style="text-align:right;">
+37196488
+</td>
+<td style="text-align:right;">
+37216193
+</td>
+<td style="text-align:left;">
+ENSG00000218739.9
+</td>
+<td style="text-align:left;">
+CEBPZOS
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+185
+</td>
+<td style="text-align:left;">
+chr10
+</td>
+<td style="text-align:right;">
+93496632
+</td>
+<td style="text-align:right;">
+93529092
+</td>
+<td style="text-align:left;">
+ENSG00000138180.15
+</td>
+<td style="text-align:left;">
+CEP55
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+187
+</td>
+<td style="text-align:left;">
+chr11
+</td>
+<td style="text-align:right;">
+95789965
+</td>
+<td style="text-align:right;">
+95832693
+</td>
+<td style="text-align:left;">
+ENSG00000166037.10
+</td>
+<td style="text-align:left;">
+CEP57
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+139
+</td>
+<td style="text-align:left;">
+chr3
+</td>
+<td style="text-align:right;">
+101723925
+</td>
+<td style="text-align:right;">
+101770562
+</td>
+<td style="text-align:left;">
+ENSG00000182504.10
+</td>
+<td style="text-align:left;">
+CEP97
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+48
+</td>
+<td style="text-align:left;">
+chr3
+</td>
+<td style="text-align:right;">
+113286947
+</td>
+<td style="text-align:right;">
+113441610
+</td>
+<td style="text-align:left;">
+ENSG00000206530.10
+</td>
+<td style="text-align:left;">
+CFAP44
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+215
+</td>
+<td style="text-align:left;">
+chr2
+</td>
+<td style="text-align:right;">
+86503431
+</td>
+<td style="text-align:right;">
+86563479
+</td>
+<td style="text-align:left;">
+ENSG00000115561.15
+</td>
+<td style="text-align:left;">
+CHMP3
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+118
+</td>
+<td style="text-align:left;">
+chr11
+</td>
+<td style="text-align:right;">
+77514936
+</td>
+<td style="text-align:right;">
+77637805
+</td>
+<td style="text-align:left;">
+ENSG00000074201.8
+</td>
+<td style="text-align:left;">
+CLNS1A
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+178
+</td>
+<td style="text-align:left;">
+chr9
+</td>
+<td style="text-align:right;">
+17134982
+</td>
+<td style="text-align:right;">
+17503923
+</td>
+<td style="text-align:left;">
+ENSG00000044459.14
+</td>
+<td style="text-align:left;">
+CNTLN
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+206
+</td>
+<td style="text-align:left;">
+chr7
+</td>
+<td style="text-align:right;">
+43608456
+</td>
+<td style="text-align:right;">
+43729717
+</td>
+<td style="text-align:left;">
+ENSG00000106603.18
+</td>
+<td style="text-align:left;">
+COA1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+141
+</td>
+<td style="text-align:left;">
+chr13
+</td>
+<td style="text-align:right;">
+39655627
+</td>
+<td style="text-align:right;">
+39791665
+</td>
+<td style="text-align:left;">
+ENSG00000133103.16
+</td>
+<td style="text-align:left;">
+COG6
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+125
+</td>
+<td style="text-align:left;">
+chrX
+</td>
+<td style="text-align:right;">
+108439844
+</td>
+<td style="text-align:right;">
+108697545
+</td>
+<td style="text-align:left;">
+ENSG00000188153.13
+</td>
+<td style="text-align:left;">
+COL4A5
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+140
+</td>
+<td style="text-align:left;">
+chr1
+</td>
+<td style="text-align:right;">
+175944831
+</td>
+<td style="text-align:right;">
+176207493
+</td>
+<td style="text-align:left;">
+ENSG00000143207.20
+</td>
+<td style="text-align:left;">
+COP1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+138
+</td>
+<td style="text-align:left;">
+chr2
+</td>
+<td style="text-align:right;">
+210477682
+</td>
+<td style="text-align:right;">
+210679107
+</td>
+<td style="text-align:left;">
+ENSG00000021826.15
+</td>
+<td style="text-align:left;">
+CPS1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+64
+</td>
+<td style="text-align:left;">
+chr6
+</td>
+<td style="text-align:right;">
+83859643
+</td>
+<td style="text-align:right;">
+83967424
+</td>
+<td style="text-align:left;">
+ENSG00000065615.13
+</td>
+<td style="text-align:left;">
+CYB5R4
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+128
+</td>
+<td style="text-align:left;">
+chr3
+</td>
+<td style="text-align:right;">
+98795941
+</td>
+<td style="text-align:right;">
+98901689
+</td>
+<td style="text-align:left;">
+ENSG00000057019.15
+</td>
+<td style="text-align:left;">
+DCBLD2
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+168
+</td>
+<td style="text-align:left;">
+chr8
+</td>
+<td style="text-align:right;">
+90001405
+</td>
+<td style="text-align:right;">
+90052092
+</td>
+<td style="text-align:left;">
+ENSG00000104325.6
+</td>
+<td style="text-align:left;">
+DECR1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+186
+</td>
+<td style="text-align:left;">
+chr17
+</td>
+<td style="text-align:right;">
+21123364
+</td>
+<td style="text-align:right;">
+21193265
+</td>
+<td style="text-align:left;">
+ENSG00000109016.17
+</td>
+<td style="text-align:left;">
+DHRS7B
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+105
+</td>
+<td style="text-align:left;">
+chr11
+</td>
+<td style="text-align:right;">
+111927144
+</td>
+<td style="text-align:right;">
+112022584
+</td>
+<td style="text-align:left;">
+ENSG00000150764.13
+</td>
+<td style="text-align:left;">
+DIXDC1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+159
+</td>
+<td style="text-align:left;">
+chr5
+</td>
+<td style="text-align:right;">
+119037772
+</td>
+<td style="text-align:right;">
+119249138
+</td>
+<td style="text-align:left;">
+ENSG00000172869.14
+</td>
+<td style="text-align:left;">
+DMXL1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+59
+</td>
+<td style="text-align:left;">
+chr2
+</td>
+<td style="text-align:right;">
+195737703
+</td>
+<td style="text-align:right;">
+196068812
+</td>
+<td style="text-align:left;">
+ENSG00000118997.13
+</td>
+<td style="text-align:left;">
+DNAH7
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+95
+</td>
+<td style="text-align:left;">
+chr18
+</td>
+<td style="text-align:right;">
+67506582
+</td>
+<td style="text-align:right;">
+67516980
+</td>
+<td style="text-align:left;">
+ENSG00000171451.13
+</td>
+<td style="text-align:left;">
+DSEL
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+107
+</td>
+<td style="text-align:left;">
+chr1
+</td>
+<td style="text-align:right;">
+212035553
+</td>
+<td style="text-align:right;">
+212107400
+</td>
+<td style="text-align:left;">
+ENSG00000143476.17
+</td>
+<td style="text-align:left;">
+DTL
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+104
+</td>
+<td style="text-align:left;">
+chr3
+</td>
+<td style="text-align:right;">
+108589682
+</td>
+<td style="text-align:right;">
+108694846
+</td>
+<td style="text-align:left;">
+ENSG00000198919.12
+</td>
+<td style="text-align:left;">
+DZIP3
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+88
+</td>
+<td style="text-align:left;">
+chr17
+</td>
+<td style="text-align:right;">
+47323290
+</td>
+<td style="text-align:right;">
+47441312
+</td>
+<td style="text-align:left;">
+ENSG00000178852.15
+</td>
+<td style="text-align:left;">
+EFCAB13
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+75
+</td>
+<td style="text-align:left;">
+chr5
+</td>
+<td style="text-align:right;">
+60873831
+</td>
+<td style="text-align:right;">
+60945073
+</td>
+<td style="text-align:left;">
+ENSG00000049167.14
+</td>
+<td style="text-align:left;">
+ERCC8
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+29
+</td>
+<td style="text-align:left;">
+chr21
+</td>
+<td style="text-align:right;">
+38380027
+</td>
+<td style="text-align:right;">
+38661780
+</td>
+<td style="text-align:left;">
+ENSG00000157554.18
+</td>
+<td style="text-align:left;">
+ERG
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+233
+</td>
+<td style="text-align:left;">
+chr19
+</td>
+<td style="text-align:right;">
+53013921
+</td>
+<td style="text-align:right;">
+53016122
+</td>
+<td style="text-align:left;">
+ENSG00000269526.1
+</td>
+<td style="text-align:left;">
+ERVV-1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+24
+</td>
+<td style="text-align:left;">
+chrX
+</td>
+<td style="text-align:right;">
+57286706
+</td>
+<td style="text-align:right;">
+57489196
+</td>
+<td style="text-align:left;">
+ENSG00000165591.6
+</td>
+<td style="text-align:left;">
+FAAH2
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+38
+</td>
+<td style="text-align:left;">
+chr11
+</td>
+<td style="text-align:right;">
+59107185
+</td>
+<td style="text-align:right;">
+59127410
+</td>
+<td style="text-align:left;">
+ENSG00000189057.10
+</td>
+<td style="text-align:left;">
+FAM111B
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+99
+</td>
+<td style="text-align:left;">
+chr5
+</td>
+<td style="text-align:right;">
+80487969
+</td>
+<td style="text-align:right;">
+80542563
+</td>
+<td style="text-align:left;">
+ENSG00000152380.9
+</td>
+<td style="text-align:left;">
+FAM151B
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+106
+</td>
+<td style="text-align:left;">
+chr7
+</td>
+<td style="text-align:right;">
+102748971
+</td>
+<td style="text-align:right;">
+102809225
+</td>
+<td style="text-align:left;">
+ENSG00000222011.8
+</td>
+<td style="text-align:left;">
+FAM185A
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+101
+</td>
+<td style="text-align:left;">
+chr15
+</td>
+<td style="text-align:right;">
+49326962
+</td>
+<td style="text-align:right;">
+49620931
+</td>
+<td style="text-align:left;">
+ENSG00000166262.15
+</td>
+<td style="text-align:left;">
+FAM227B
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+161
+</td>
+<td style="text-align:left;">
+chr4
+</td>
+<td style="text-align:right;">
+112145397
+</td>
+<td style="text-align:right;">
+112195256
+</td>
+<td style="text-align:left;">
+ENSG00000174749.5
+</td>
+<td style="text-align:left;">
+FAM241A
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+146
+</td>
+<td style="text-align:left;">
+chr15
+</td>
+<td style="text-align:right;">
+59372693
+</td>
+<td style="text-align:right;">
+59523549
+</td>
+<td style="text-align:left;">
+ENSG00000157470.11
+</td>
+<td style="text-align:left;">
+FAM81A
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+144
+</td>
+<td style="text-align:left;">
+chr11
+</td>
+<td style="text-align:right;">
+72836745
+</td>
+<td style="text-align:right;">
+73142261
+</td>
+<td style="text-align:left;">
+ENSG00000137478.14
+</td>
+<td style="text-align:left;">
+FCHSD2
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+109
+</td>
+<td style="text-align:left;">
+chr1
+</td>
+<td style="text-align:right;">
+59296638
+</td>
+<td style="text-align:right;">
+59810647
+</td>
+<td style="text-align:left;">
+ENSG00000172456.17
+</td>
+<td style="text-align:left;">
+FGGY
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+15
+</td>
+<td style="text-align:left;">
+chr9
+</td>
+<td style="text-align:right;">
+105558130
+</td>
+<td style="text-align:right;">
+105641118
+</td>
+<td style="text-align:left;">
+ENSG00000106692.14
+</td>
+<td style="text-align:left;">
+FKTN
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+100
+</td>
+<td style="text-align:left;">
+chr15
+</td>
+<td style="text-align:right;">
+49155656
+</td>
+<td style="text-align:right;">
+49367869
+</td>
+<td style="text-align:left;">
+ENSG00000156958.14
+</td>
+<td style="text-align:left;">
+GALK2
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+222
+</td>
+<td style="text-align:left;">
+chr18
+</td>
+<td style="text-align:right;">
+35581117
+</td>
+<td style="text-align:right;">
+35711834
+</td>
+<td style="text-align:left;">
+ENSG00000141429.13
+</td>
+<td style="text-align:left;">
+GALNT1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+126
+</td>
+<td style="text-align:left;">
+chr14
+</td>
+<td style="text-align:right;">
+54842008
+</td>
+<td style="text-align:right;">
+54902852
+</td>
+<td style="text-align:left;">
+ENSG00000131979.18
+</td>
+<td style="text-align:left;">
+GCH1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+53
+</td>
+<td style="text-align:left;">
+chr5
+</td>
+<td style="text-align:right;">
+151822513
+</td>
+<td style="text-align:right;">
+151924842
+</td>
+<td style="text-align:left;">
+ENSG00000145888.10
+</td>
+<td style="text-align:left;">
+GLRA1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+198
+</td>
+<td style="text-align:left;">
+chr9
+</td>
+<td style="text-align:right;">
+86026146
+</td>
+<td style="text-align:right;">
+86100173
+</td>
+<td style="text-align:left;">
+ENSG00000135052.16
+</td>
+<td style="text-align:left;">
+GOLM1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+62
+</td>
+<td style="text-align:left;">
+chrX
+</td>
+<td style="text-align:right;">
+9725346
+</td>
+<td style="text-align:right;">
+9786297
+</td>
+<td style="text-align:left;">
+ENSG00000101850.12
+</td>
+<td style="text-align:left;">
+GPR143
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+108
+</td>
+<td style="text-align:left;">
+chr10
+</td>
+<td style="text-align:right;">
+91409280
+</td>
+<td style="text-align:right;">
+91514829
+</td>
+<td style="text-align:left;">
+ENSG00000165338.16
+</td>
+<td style="text-align:left;">
+HECTD2
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+39
+</td>
+<td style="text-align:left;">
+chr15
+</td>
+<td style="text-align:right;">
+28111040
+</td>
+<td style="text-align:right;">
+28322152
+</td>
+<td style="text-align:left;">
+ENSG00000128731.16
+</td>
+<td style="text-align:left;">
+HERC2
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+188
+</td>
+<td style="text-align:left;">
+chr2
+</td>
+<td style="text-align:right;">
+190189735
+</td>
+<td style="text-align:right;">
+190344193
+</td>
+<td style="text-align:left;">
+ENSG00000198130.15
+</td>
+<td style="text-align:left;">
+HIBCH
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+133
+</td>
+<td style="text-align:left;">
+chr6
+</td>
+<td style="text-align:right;">
+12008762
+</td>
+<td style="text-align:right;">
+12164999
+</td>
+<td style="text-align:left;">
+ENSG00000095951.16
+</td>
+<td style="text-align:left;">
+HIVEP1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+167
+</td>
+<td style="text-align:left;">
+chrX
+</td>
+<td style="text-align:right;">
+131273506
+</td>
+<td style="text-align:right;">
+131578899
+</td>
+<td style="text-align:left;">
+ENSG00000147255.18
+</td>
+<td style="text-align:left;">
+IGSF1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+69
+</td>
+<td style="text-align:left;">
+chr9
+</td>
+<td style="text-align:right;">
+5123880
+</td>
+<td style="text-align:right;">
+5185668
+</td>
+<td style="text-align:left;">
+ENSG00000120210.7
+</td>
+<td style="text-align:left;">
+INSL6
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+177
+</td>
+<td style="text-align:left;">
+chr9
+</td>
+<td style="text-align:right;">
+100099256
+</td>
+<td style="text-align:right;">
+100301000
+</td>
+<td style="text-align:left;">
+ENSG00000119509.12
+</td>
+<td style="text-align:left;">
+INVS
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+228
+</td>
+<td style="text-align:left;">
+chr13
+</td>
+<td style="text-align:right;">
+101452593
+</td>
+<td style="text-align:right;">
+101720856
+</td>
+<td style="text-align:left;">
+ENSG00000198542.13
+</td>
+<td style="text-align:left;">
+ITGBL1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+182
+</td>
+<td style="text-align:left;">
+chr9
+</td>
+<td style="text-align:right;">
+4984390
+</td>
+<td style="text-align:right;">
+5128183
+</td>
+<td style="text-align:left;">
+ENSG00000096968.13
+</td>
+<td style="text-align:left;">
+JAK2
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+195
+</td>
+<td style="text-align:left;">
+chr11
+</td>
+<td style="text-align:right;">
+96389989
+</td>
+<td style="text-align:right;">
+96507574
+</td>
+<td style="text-align:left;">
+ENSG00000183340.6
+</td>
+<td style="text-align:left;">
+JRKL
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+180
+</td>
+<td style="text-align:left;">
+chrX
+</td>
+<td style="text-align:right;">
+53094145
+</td>
+<td style="text-align:right;">
+53170914
+</td>
+<td style="text-align:left;">
+ENSG00000232593.7
+</td>
+<td style="text-align:left;">
+KANTR
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+9
+</td>
+<td style="text-align:left;">
+chr18
+</td>
+<td style="text-align:right;">
+79863668
+</td>
+<td style="text-align:right;">
+79900184
+</td>
+<td style="text-align:left;">
+ENSG00000178342.4
+</td>
+<td style="text-align:left;">
+KCNG2
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+92
+</td>
+<td style="text-align:left;">
+chr4
+</td>
+<td style="text-align:right;">
+20728616
+</td>
+<td style="text-align:right;">
+21948799
+</td>
+<td style="text-align:left;">
+ENSG00000185774.15
+</td>
+<td style="text-align:left;">
+KCNIP4
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+134
+</td>
+<td style="text-align:left;">
+chr12
+</td>
+<td style="text-align:right;">
+280129
+</td>
+<td style="text-align:right;">
+389454
+</td>
+<td style="text-align:left;">
+ENSG00000073614.12
+</td>
+<td style="text-align:left;">
+KDM5A
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+136
+</td>
+<td style="text-align:left;">
+chr1
+</td>
+<td style="text-align:right;">
+35433490
+</td>
+<td style="text-align:right;">
+35557950
+</td>
+<td style="text-align:left;">
+ENSG00000142687.17
+</td>
+<td style="text-align:left;">
+KIAA0319L
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+166
+</td>
+<td style="text-align:left;">
+chr14
+</td>
+<td style="text-align:right;">
+58427385
+</td>
+<td style="text-align:right;">
+58551289
+</td>
+<td style="text-align:left;">
+ENSG00000100578.14
+</td>
+<td style="text-align:left;">
+KIAA0586
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+117
+</td>
+<td style="text-align:left;">
+chr5
+</td>
+<td style="text-align:right;">
+94152966
+</td>
+<td style="text-align:right;">
+94618597
+</td>
+<td style="text-align:left;">
+ENSG00000185261.14
+</td>
+<td style="text-align:left;">
+KIAA0825
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+36
+</td>
+<td style="text-align:left;">
+chr12
+</td>
+<td style="text-align:right;">
+31959370
+</td>
+<td style="text-align:right;">
+31993107
+</td>
+<td style="text-align:left;">
+ENSG00000174718.11
+</td>
+<td style="text-align:left;">
+KIAA1551
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+87
+</td>
+<td style="text-align:left;">
+chr15
+</td>
+<td style="text-align:right;">
+89608789
+</td>
+<td style="text-align:right;">
+89655451
+</td>
+<td style="text-align:left;">
+ENSG00000166813.14
+</td>
+<td style="text-align:left;">
+KIF7
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+131
+</td>
+<td style="text-align:left;">
+chr1
+</td>
+<td style="text-align:right;">
+173714941
+</td>
+<td style="text-align:right;">
+173786702
+</td>
+<td style="text-align:left;">
+ENSG00000076321.10
+</td>
+<td style="text-align:left;">
+KLHL20
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+79
+</td>
+<td style="text-align:left;">
+chr6
+</td>
+<td style="text-align:right;">
+116681187
+</td>
+<td style="text-align:right;">
+116741866
+</td>
+<td style="text-align:left;">
+ENSG00000196911.10
+</td>
+<td style="text-align:left;">
+KPNA5
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+211
+</td>
+<td style="text-align:left;">
+chrX
+</td>
+<td style="text-align:right;">
+46446857
+</td>
+<td style="text-align:right;">
+46497422
+</td>
+<td style="text-align:left;">
+ENSG00000147121.15
+</td>
+<td style="text-align:left;">
+KRBOX4
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+51
+</td>
+<td style="text-align:left;">
+chr13
+</td>
+<td style="text-align:right;">
+108207439
+</td>
+<td style="text-align:right;">
+108218368
+</td>
+<td style="text-align:left;">
+ENSG00000174405.13
+</td>
+<td style="text-align:left;">
+LIG4
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+121
+</td>
+<td style="text-align:left;">
+chr4
+</td>
+<td style="text-align:right;">
+150264531
+</td>
+<td style="text-align:right;">
+151015727
+</td>
+<td style="text-align:left;">
+ENSG00000198589.11
+</td>
+<td style="text-align:left;">
+LRBA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+158
+</td>
+<td style="text-align:left;">
+chr1
+</td>
+<td style="text-align:right;">
+116111755
+</td>
+<td style="text-align:right;">
+116135240
+</td>
+<td style="text-align:left;">
+ENSG00000173212.4
+</td>
+<td style="text-align:left;">
+MAB21L3
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+189
+</td>
+<td style="text-align:left;">
+chr1
+</td>
+<td style="text-align:right;">
+113390749
+</td>
+<td style="text-align:right;">
+113685923
+</td>
+<td style="text-align:left;">
+ENSG00000081026.18
+</td>
+<td style="text-align:left;">
+MAGI3
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+137
+</td>
+<td style="text-align:left;">
+chr2
+</td>
+<td style="text-align:right;">
+148021011
+</td>
+<td style="text-align:right;">
+148516971
+</td>
+<td style="text-align:left;">
+ENSG00000204406.13
+</td>
+<td style="text-align:left;">
+MBD5
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+197
+</td>
+<td style="text-align:left;">
+chr6
+</td>
+<td style="text-align:right;">
+118813442
+</td>
+<td style="text-align:right;">
+118935162
+</td>
+<td style="text-align:left;">
+ENSG00000111877.17
+</td>
+<td style="text-align:left;">
+MCM9
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+212
+</td>
+<td style="text-align:left;">
+chr12
+</td>
+<td style="text-align:right;">
+27022546
+</td>
+<td style="text-align:right;">
+27066343
+</td>
+<td style="text-align:left;">
+ENSG00000152944.8
+</td>
+<td style="text-align:left;">
+MED21
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+142
+</td>
+<td style="text-align:left;">
+chr18
+</td>
+<td style="text-align:right;">
+21704957
+</td>
+<td style="text-align:right;">
+21870957
+</td>
+<td style="text-align:left;">
+ENSG00000101752.11
+</td>
+<td style="text-align:left;">
+MIB1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+93
+</td>
+<td style="text-align:left;">
+chr14
+</td>
+<td style="text-align:right;">
+37197913
+</td>
+<td style="text-align:right;">
+37552361
+</td>
+<td style="text-align:left;">
+ENSG00000151338.18
+</td>
+<td style="text-align:left;">
+MIPOL1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+58
+</td>
+<td style="text-align:left;">
+chr22
+</td>
+<td style="text-align:right;">
+30925130
+</td>
+<td style="text-align:right;">
+30968298
+</td>
+<td style="text-align:left;">
+ENSG00000133422.12
+</td>
+<td style="text-align:left;">
+MORC2
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+4
+</td>
+<td style="text-align:left;">
+chr9
+</td>
+<td style="text-align:right;">
+21802543
+</td>
+<td style="text-align:right;">
+21937651
+</td>
+<td style="text-align:left;">
+ENSG00000099810.19
+</td>
+<td style="text-align:left;">
+MTAP
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+52
+</td>
+<td style="text-align:left;">
+chr8
+</td>
+<td style="text-align:right;">
+120445400
+</td>
+<td style="text-align:right;">
+120542133
+</td>
+<td style="text-align:left;">
+ENSG00000172167.7
+</td>
+<td style="text-align:left;">
+MTBP
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:left;">
+chr19
+</td>
+<td style="text-align:right;">
+8848844
+</td>
+<td style="text-align:right;">
+8981342
+</td>
+<td style="text-align:left;">
+ENSG00000181143.15
+</td>
+<td style="text-align:left;">
+MUC16
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+156
+</td>
+<td style="text-align:left;">
+chr15
+</td>
+<td style="text-align:right;">
+71822289
+</td>
+<td style="text-align:right;">
+72118577
+</td>
+<td style="text-align:left;">
+ENSG00000066933.15
+</td>
+<td style="text-align:left;">
+MYO9A
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+42
+</td>
+<td style="text-align:left;">
+chr3
+</td>
+<td style="text-align:right;">
+174438573
+</td>
+<td style="text-align:right;">
+175810552
+</td>
+<td style="text-align:left;">
+ENSG00000177694.15
+</td>
+<td style="text-align:left;">
+NAALADL2
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+209
+</td>
+<td style="text-align:left;">
+chr12
+</td>
+<td style="text-align:right;">
+4649095
+</td>
+<td style="text-align:right;">
+4694317
+</td>
+<td style="text-align:left;">
+ENSG00000139180.10
+</td>
+<td style="text-align:left;">
+NDUFA9
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+30
+</td>
+<td style="text-align:left;">
+chr4
+</td>
+<td style="text-align:right;">
+169392857
+</td>
+<td style="text-align:right;">
+169612629
+</td>
+<td style="text-align:left;">
+ENSG00000137601.16
+</td>
+<td style="text-align:left;">
+NEK1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+57
+</td>
+<td style="text-align:left;">
+chr2
+</td>
+<td style="text-align:right;">
+177227595
+</td>
+<td style="text-align:right;">
+177392697
+</td>
+<td style="text-align:left;">
+ENSG00000116044.15
+</td>
+<td style="text-align:left;">
+NFE2L2
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+235
+</td>
+<td style="text-align:left;">
+chr3
+</td>
+<td style="text-align:right;">
+173396284
+</td>
+<td style="text-align:right;">
+174286644
+</td>
+<td style="text-align:left;">
+ENSG00000169760.17
+</td>
+<td style="text-align:left;">
+NLGN1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+153
+</td>
+<td style="text-align:left;">
+chr4
+</td>
+<td style="text-align:right;">
+148078762
+</td>
+<td style="text-align:right;">
+148444698
+</td>
+<td style="text-align:left;">
+ENSG00000151623.14
+</td>
+<td style="text-align:left;">
+NR3C2
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+74
+</td>
+<td style="text-align:left;">
+chr3
+</td>
+<td style="text-align:right;">
+31657890
+</td>
+<td style="text-align:right;">
+32077580
+</td>
+<td style="text-align:left;">
+ENSG00000144645.13
+</td>
+<td style="text-align:left;">
+OSBPL10
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+28
+</td>
+<td style="text-align:left;">
+chr5
+</td>
+<td style="text-align:right;">
+38845858
+</td>
+<td style="text-align:right;">
+38945596
+</td>
+<td style="text-align:left;">
+ENSG00000145623.12
+</td>
+<td style="text-align:left;">
+OSMR
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+91
+</td>
+<td style="text-align:left;">
+chr4
+</td>
+<td style="text-align:right;">
+20696282
+</td>
+<td style="text-align:right;">
+20752907
+</td>
+<td style="text-align:left;">
+ENSG00000163138.18
+</td>
+<td style="text-align:left;">
+PACRGL
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+41
+</td>
+<td style="text-align:left;">
+chr2
+</td>
+<td style="text-align:right;">
+61017225
+</td>
+<td style="text-align:right;">
+61051990
+</td>
+<td style="text-align:left;">
+ENSG00000162928.8
+</td>
+<td style="text-align:left;">
+PEX13
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+110
+</td>
+<td style="text-align:left;">
+chr20
+</td>
+<td style="text-align:right;">
+8077251
+</td>
+<td style="text-align:right;">
+8968360
+</td>
+<td style="text-align:left;">
+ENSG00000182621.17
+</td>
+<td style="text-align:left;">
+PLCB1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+172
+</td>
+<td style="text-align:left;">
+chr5
+</td>
+<td style="text-align:right;">
+55424854
+</td>
+<td style="text-align:right;">
+55535050
+</td>
+<td style="text-align:left;">
+ENSG00000067113.16
+</td>
+<td style="text-align:left;">
+PLPP1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+223
+</td>
+<td style="text-align:left;">
+chr11
+</td>
+<td style="text-align:right;">
+74171099
+</td>
+<td style="text-align:right;">
+74254703
+</td>
+<td style="text-align:left;">
+ENSG00000214517.9
+</td>
+<td style="text-align:left;">
+PPME1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+83
+</td>
+<td style="text-align:left;">
+chr6
+</td>
+<td style="text-align:right;">
+57314805
+</td>
+<td style="text-align:right;">
+57646849
+</td>
+<td style="text-align:left;">
+ENSG00000146143.17
+</td>
+<td style="text-align:left;">
+PRIM2
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+122
+</td>
+<td style="text-align:left;">
+chr7
+</td>
+<td style="text-align:right;">
+549197
+</td>
+<td style="text-align:right;">
+727650
+</td>
+<td style="text-align:left;">
+ENSG00000188191.14
+</td>
+<td style="text-align:left;">
+PRKAR1B
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+173
+</td>
+<td style="text-align:left;">
+chr11
+</td>
+<td style="text-align:right;">
+112226365
+</td>
+<td style="text-align:right;">
+112269955
+</td>
+<td style="text-align:left;">
+ENSG00000150787.7
+</td>
+<td style="text-align:left;">
+PTS
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+116
+</td>
+<td style="text-align:left;">
+chr12
+</td>
+<td style="text-align:right;">
+43718993
+</td>
+<td style="text-align:right;">
+43758817
+</td>
+<td style="text-align:left;">
+ENSG00000129317.14
+</td>
+<td style="text-align:left;">
+PUS7L
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:left;">
+chr12
+</td>
+<td style="text-align:right;">
+9148840
+</td>
+<td style="text-align:right;">
+9208370
+</td>
+<td style="text-align:left;">
+ENSG00000126838.9
+</td>
+<td style="text-align:left;">
+PZP
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+17
+</td>
+<td style="text-align:left;">
+chr3
+</td>
+<td style="text-align:right;">
+120686681
+</td>
+<td style="text-align:right;">
+120742993
+</td>
+<td style="text-align:left;">
+ENSG00000144840.9
+</td>
+<td style="text-align:left;">
+RABL3
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+192
+</td>
+<td style="text-align:left;">
+chr7
+</td>
+<td style="text-align:right;">
+5045821
+</td>
+<td style="text-align:right;">
+5069488
+</td>
+<td style="text-align:left;">
+ENSG00000146587.17
+</td>
+<td style="text-align:left;">
+RBAK
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+191
+</td>
+<td style="text-align:left;">
+chr7
+</td>
+<td style="text-align:right;">
+4983718
+</td>
+<td style="text-align:right;">
+5073221
+</td>
+<td style="text-align:left;">
+ENSG00000272968.5
+</td>
+<td style="text-align:left;">
+RBAK-RBAKDN
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+216
+</td>
+<td style="text-align:left;">
+chr2
+</td>
+<td style="text-align:right;">
+86505668
+</td>
+<td style="text-align:right;">
+86721122
+</td>
+<td style="text-align:left;">
+ENSG00000249884.8
+</td>
+<td style="text-align:left;">
+RNF103-CHMP3
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+6
+</td>
+<td style="text-align:left;">
+chr1
+</td>
+<td style="text-align:right;">
+92298965
+</td>
+<td style="text-align:right;">
+92402056
+</td>
+<td style="text-align:left;">
+ENSG00000122484.8
+</td>
+<td style="text-align:left;">
+RPAP2
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+174
+</td>
+<td style="text-align:left;">
+chr18
+</td>
+<td style="text-align:right;">
+70003031
+</td>
+<td style="text-align:right;">
+70205945
+</td>
+<td style="text-align:left;">
+ENSG00000176225.13
+</td>
+<td style="text-align:left;">
+RTTN
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+220
+</td>
+<td style="text-align:left;">
+chr3
+</td>
+<td style="text-align:right;">
+134065303
+</td>
+<td style="text-align:right;">
+134250744
+</td>
+<td style="text-align:left;">
+ENSG00000163785.12
+</td>
+<td style="text-align:left;">
+RYK
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+3
+</td>
+<td style="text-align:left;">
+chr13
+</td>
+<td style="text-align:right;">
+23328826
+</td>
+<td style="text-align:right;">
+23433740
+</td>
+<td style="text-align:left;">
+ENSG00000151835.15
+</td>
+<td style="text-align:left;">
+SACS
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+78
+</td>
+<td style="text-align:left;">
+chr7
+</td>
+<td style="text-align:right;">
+93099513
+</td>
+<td style="text-align:right;">
+93118023
+</td>
+<td style="text-align:left;">
+ENSG00000205413.7
+</td>
+<td style="text-align:left;">
+SAMD9
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+37
+</td>
+<td style="text-align:left;">
+chr4
+</td>
+<td style="text-align:right;">
+128864921
+</td>
+<td style="text-align:right;">
+129093607
+</td>
+<td style="text-align:left;">
+ENSG00000151466.11
+</td>
+<td style="text-align:left;">
+SCLT1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+237
+</td>
+<td style="text-align:left;">
+chr6
+</td>
+<td style="text-align:right;">
+107867756
+</td>
+<td style="text-align:right;">
+107958189
+</td>
+<td style="text-align:left;">
+ENSG00000025796.13
+</td>
+<td style="text-align:left;">
+SEC63
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+98
+</td>
+<td style="text-align:left;">
+chr2
+</td>
+<td style="text-align:right;">
+217730
+</td>
+<td style="text-align:right;">
+266398
+</td>
+<td style="text-align:left;">
+ENSG00000035115.21
+</td>
+<td style="text-align:left;">
+SH3YL1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+152
+</td>
+<td style="text-align:left;">
+chr15
+</td>
+<td style="text-align:right;">
+50182196
+</td>
+<td style="text-align:right;">
+50236395
+</td>
+<td style="text-align:left;">
+ENSG00000140284.10
+</td>
+<td style="text-align:left;">
+SLC27A2
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+97
+</td>
+<td style="text-align:left;">
+chr10
+</td>
+<td style="text-align:right;">
+93893973
+</td>
+<td style="text-align:right;">
+93956062
+</td>
+<td style="text-align:left;">
+ENSG00000176273.14
+</td>
+<td style="text-align:left;">
+SLC35G1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+35
+</td>
+<td style="text-align:left;">
+chr12
+</td>
+<td style="text-align:right;">
+46183063
+</td>
+<td style="text-align:right;">
+46270017
+</td>
+<td style="text-align:left;">
+ENSG00000111371.15
+</td>
+<td style="text-align:left;">
+SLC38A1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+202
+</td>
+<td style="text-align:left;">
+chr3
+</td>
+<td style="text-align:right;">
+113442718
+</td>
+<td style="text-align:right;">
+113515187
+</td>
+<td style="text-align:left;">
+ENSG00000163611.11
+</td>
+<td style="text-align:left;">
+SPICE1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+135
+</td>
+<td style="text-align:left;">
+chrX
+</td>
+<td style="text-align:right;">
+56818298
+</td>
+<td style="text-align:right;">
+56995827
+</td>
+<td style="text-align:left;">
+ENSG00000204271.12
+</td>
+<td style="text-align:left;">
+SPIN3
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+102
+</td>
+<td style="text-align:left;">
+chr2
+</td>
+<td style="text-align:right;">
+9843354
+</td>
+<td style="text-align:right;">
+9934416
+</td>
+<td style="text-align:left;">
+ENSG00000115750.16
+</td>
+<td style="text-align:left;">
+TAF1B
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+18
+</td>
+<td style="text-align:left;">
+chr5
+</td>
+<td style="text-align:right;">
+141260225
+</td>
+<td style="text-align:right;">
+141320821
+</td>
+<td style="text-align:left;">
+ENSG00000178913.7
+</td>
+<td style="text-align:left;">
+TAF7
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+26
+</td>
+<td style="text-align:left;">
+chr17
+</td>
+<td style="text-align:right;">
+82752064
+</td>
+<td style="text-align:right;">
+82945922
+</td>
+<td style="text-align:left;">
+ENSG00000141556.20
+</td>
+<td style="text-align:left;">
+TBCD
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+127
+</td>
+<td style="text-align:left;">
+chr4
+</td>
+<td style="text-align:right;">
+106041599
+</td>
+<td style="text-align:right;">
+106321495
+</td>
+<td style="text-align:left;">
+ENSG00000145348.16
+</td>
+<td style="text-align:left;">
+TBCK
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+61
+</td>
+<td style="text-align:left;">
+chrX
+</td>
+<td style="text-align:right;">
+9463295
+</td>
+<td style="text-align:right;">
+9741037
+</td>
+<td style="text-align:left;">
+ENSG00000101849.16
+</td>
+<td style="text-align:left;">
+TBL1X
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+23
+</td>
+<td style="text-align:left;">
+chr13
+</td>
+<td style="text-align:right;">
+113584721
+</td>
+<td style="text-align:right;">
+113641470
+</td>
+<td style="text-align:left;">
+ENSG00000198176.12
+</td>
+<td style="text-align:left;">
+TFDP1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+160
+</td>
+<td style="text-align:left;">
+chr3
+</td>
+<td style="text-align:right;">
+141944428
+</td>
+<td style="text-align:right;">
+142149544
+</td>
+<td style="text-align:left;">
+ENSG00000114126.17
+</td>
+<td style="text-align:left;">
+TFDP2
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+81
+</td>
+<td style="text-align:left;">
+chr2
+</td>
+<td style="text-align:right;">
+187464230
+</td>
+<td style="text-align:right;">
+187565760
+</td>
+<td style="text-align:left;">
+ENSG00000003436.15
+</td>
+<td style="text-align:left;">
+TFPI
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+56
+</td>
+<td style="text-align:left;">
+chr2
+</td>
+<td style="text-align:right;">
+43230836
+</td>
+<td style="text-align:right;">
+43596046
+</td>
+<td style="text-align:left;">
+ENSG00000115970.18
+</td>
+<td style="text-align:left;">
+THADA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+85
+</td>
+<td style="text-align:left;">
+chr12
+</td>
+<td style="text-align:right;">
+4307763
+</td>
+<td style="text-align:right;">
+4354593
+</td>
+<td style="text-align:left;">
+ENSG00000078237.6
+</td>
+<td style="text-align:left;">
+TIGAR
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+19
+</td>
+<td style="text-align:left;">
+chr5
+</td>
+<td style="text-align:right;">
+43444252
+</td>
+<td style="text-align:right;">
+43483893
+</td>
+<td style="text-align:left;">
+ENSG00000151881.14
+</td>
+<td style="text-align:left;">
+TMEM267
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+89
+</td>
+<td style="text-align:left;">
+chr3
+</td>
+<td style="text-align:right;">
+119429500
+</td>
+<td style="text-align:right;">
+119468830
+</td>
+<td style="text-align:left;">
+ENSG00000176142.12
+</td>
+<td style="text-align:left;">
+TMEM39A
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+86
+</td>
+<td style="text-align:left;">
+chr3
+</td>
+<td style="text-align:right;">
+100492619
+</td>
+<td style="text-align:right;">
+100577444
+</td>
+<td style="text-align:left;">
+ENSG00000181458.10
+</td>
+<td style="text-align:left;">
+TMEM45A
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+96
+</td>
+<td style="text-align:left;">
+chr15
+</td>
+<td style="text-align:right;">
+42210452
+</td>
+<td style="text-align:right;">
+42273663
+</td>
+<td style="text-align:left;">
+ENSG00000103978.15
+</td>
+<td style="text-align:left;">
+TMEM87A
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+232
+</td>
+<td style="text-align:left;">
+chr13
+</td>
+<td style="text-align:right;">
+100603927
+</td>
+<td style="text-align:right;">
+100675093
+</td>
+<td style="text-align:left;">
+ENSG00000125247.15
+</td>
+<td style="text-align:left;">
+TMTC4
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+90
+</td>
+<td style="text-align:left;">
+chr21
+</td>
+<td style="text-align:right;">
+44350163
+</td>
+<td style="text-align:right;">
+44443081
+</td>
+<td style="text-align:left;">
+ENSG00000142185.16
+</td>
+<td style="text-align:left;">
+TRPM2
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+13
+</td>
+<td style="text-align:left;">
+chr2
+</td>
+<td style="text-align:right;">
+98997261
+</td>
+<td style="text-align:right;">
+99154964
+</td>
+<td style="text-align:left;">
+ENSG00000135951.14
+</td>
+<td style="text-align:left;">
+TSGA10
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+221
+</td>
+<td style="text-align:left;">
+chr3
+</td>
+<td style="text-align:right;">
+23203020
+</td>
+<td style="text-align:right;">
+23591793
+</td>
+<td style="text-align:left;">
+ENSG00000182247.9
+</td>
+<td style="text-align:left;">
+UBE2E2
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+164
+</td>
+<td style="text-align:left;">
+chr6
+</td>
+<td style="text-align:right;">
+99432379
+</td>
+<td style="text-align:right;">
+99521728
+</td>
+<td style="text-align:left;">
+ENSG00000123552.17
+</td>
+<td style="text-align:left;">
+USP45
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+132
+</td>
+<td style="text-align:left;">
+chr7
+</td>
+<td style="text-align:right;">
+55436056
+</td>
+<td style="text-align:right;">
+55572988
+</td>
+<td style="text-align:left;">
+ENSG00000154978.12
+</td>
+<td style="text-align:left;">
+VOPP1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+155
+</td>
+<td style="text-align:left;">
+chr15
+</td>
+<td style="text-align:right;">
+61852389
+</td>
+<td style="text-align:right;">
+62060473
+</td>
+<td style="text-align:left;">
+ENSG00000129003.17
+</td>
+<td style="text-align:left;">
+VPS13C
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+157
+</td>
+<td style="text-align:left;">
+chr7
+</td>
+<td style="text-align:right;">
+93232340
+</td>
+<td style="text-align:right;">
+93361121
+</td>
+<td style="text-align:left;">
+ENSG00000004766.16
+</td>
+<td style="text-align:left;">
+VPS50
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+82
+</td>
+<td style="text-align:left;">
+chr5
+</td>
+<td style="text-align:right;">
+37379212
+</td>
+<td style="text-align:right;">
+37753435
+</td>
+<td style="text-align:left;">
+ENSG00000082068.8
+</td>
+<td style="text-align:left;">
+WDR70
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+94
+</td>
+<td style="text-align:left;">
+chr3
+</td>
+<td style="text-align:right;">
+195068279
+</td>
+<td style="text-align:right;">
+195271167
+</td>
+<td style="text-align:left;">
+ENSG00000173950.15
+</td>
+<td style="text-align:left;">
+XXYLT1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+124
+</td>
+<td style="text-align:left;">
+chr3
+</td>
+<td style="text-align:right;">
+38346760
+</td>
+<td style="text-align:right;">
+38421348
+</td>
+<td style="text-align:left;">
+ENSG00000093217.10
+</td>
+<td style="text-align:left;">
+XYLB
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+236
+</td>
+<td style="text-align:left;">
+chr3
+</td>
+<td style="text-align:right;">
+114314501
+</td>
+<td style="text-align:right;">
+115147271
+</td>
+<td style="text-align:left;">
+ENSG00000181722.16
+</td>
+<td style="text-align:left;">
+ZBTB20
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+119
+</td>
+<td style="text-align:left;">
+chr3
+</td>
+<td style="text-align:right;">
+28349146
+</td>
+<td style="text-align:right;">
+28538122
+</td>
+<td style="text-align:left;">
+ENSG00000206559.7
+</td>
+<td style="text-align:left;">
+ZCWPW2
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+113
+</td>
+<td style="text-align:left;">
+chr2
+</td>
+<td style="text-align:right;">
+206274663
+</td>
+<td style="text-align:right;">
+206314438
+</td>
+<td style="text-align:left;">
+ENSG00000204186.8
+</td>
+<td style="text-align:left;">
+ZDBF2
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+80
+</td>
+<td style="text-align:left;">
+chr11
+</td>
+<td style="text-align:right;">
+19117099
+</td>
+<td style="text-align:right;">
+19176422
+</td>
+<td style="text-align:left;">
+ENSG00000177054.13
+</td>
+<td style="text-align:left;">
+ZDHHC13
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+238
+</td>
+<td style="text-align:left;">
+chr10
+</td>
+<td style="text-align:right;">
+31318495
+</td>
+<td style="text-align:right;">
+31529814
+</td>
+<td style="text-align:left;">
+ENSG00000148516.21
+</td>
+<td style="text-align:left;">
+ZEB1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+203
+</td>
+<td style="text-align:left;">
+chr10
+</td>
+<td style="text-align:right;">
+134465
+</td>
+<td style="text-align:right;">
+254637
+</td>
+<td style="text-align:left;">
+ENSG00000015171.19
+</td>
+<td style="text-align:left;">
+ZMYND11
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+67
+</td>
+<td style="text-align:left;">
+chr19
+</td>
+<td style="text-align:right;">
+19668796
+</td>
+<td style="text-align:right;">
+19683509
+</td>
+<td style="text-align:left;">
+ENSG00000181896.11
+</td>
+<td style="text-align:left;">
+ZNF101
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+217
+</td>
+<td style="text-align:left;">
+chr7
+</td>
+<td style="text-align:right;">
+64666083
+</td>
+<td style="text-align:right;">
+64711582
+</td>
+<td style="text-align:left;">
+ENSG00000196247.11
+</td>
+<td style="text-align:left;">
+ZNF107
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+73
+</td>
+<td style="text-align:left;">
+chr19
+</td>
+<td style="text-align:right;">
+36214602
+</td>
+<td style="text-align:right;">
+36238774
+</td>
+<td style="text-align:left;">
+ENSG00000167635.11
+</td>
+<td style="text-align:left;">
+ZNF146
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+8
+</td>
+<td style="text-align:left;">
+chr19
+</td>
+<td style="text-align:right;">
+43967862
+</td>
+<td style="text-align:right;">
+43998325
+</td>
+<td style="text-align:left;">
+ENSG00000204920.10
+</td>
+<td style="text-align:left;">
+ZNF155
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+44
+</td>
+<td style="text-align:left;">
+chr19
+</td>
+<td style="text-align:right;">
+53066606
+</td>
+<td style="text-align:right;">
+53103436
+</td>
+<td style="text-align:left;">
+ENSG00000170949.17
+</td>
+<td style="text-align:left;">
+ZNF160
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+123
+</td>
+<td style="text-align:left;">
+chr9
+</td>
+<td style="text-align:right;">
+101398873
+</td>
+<td style="text-align:right;">
+101410660
+</td>
+<td style="text-align:left;">
+ENSG00000136870.10
+</td>
+<td style="text-align:left;">
+ZNF189
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+115
+</td>
+<td style="text-align:left;">
+chr3
+</td>
+<td style="text-align:right;">
+44584888
+</td>
+<td style="text-align:right;">
+44648471
+</td>
+<td style="text-align:left;">
+ENSG00000186448.14
+</td>
+<td style="text-align:left;">
+ZNF197
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+229
+</td>
+<td style="text-align:left;">
+chr19
+</td>
+<td style="text-align:right;">
+57630395
+</td>
+<td style="text-align:right;">
+57642779
+</td>
+<td style="text-align:left;">
+ENSG00000121417.13
+</td>
+<td style="text-align:left;">
+ZNF211
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+7
+</td>
+<td style="text-align:left;">
+chr19
+</td>
+<td style="text-align:right;">
+43951223
+</td>
+<td style="text-align:right;">
+43967709
+</td>
+<td style="text-align:left;">
+ENSG00000159905.14
+</td>
+<td style="text-align:left;">
+ZNF221
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+147
+</td>
+<td style="text-align:left;">
+chr16
+</td>
+<td style="text-align:right;">
+71447597
+</td>
+<td style="text-align:right;">
+71463095
+</td>
+<td style="text-align:left;">
+ENSG00000167377.18
+</td>
+<td style="text-align:left;">
+ZNF23
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+22
+</td>
+<td style="text-align:left;">
+chr10
+</td>
+<td style="text-align:right;">
+43556344
+</td>
+<td style="text-align:right;">
+43574618
+</td>
+<td style="text-align:left;">
+ENSG00000196793.13
+</td>
+<td style="text-align:left;">
+ZNF239
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+60
+</td>
+<td style="text-align:left;">
+chr8
+</td>
+<td style="text-align:right;">
+144720907
+</td>
+<td style="text-align:right;">
+144756417
+</td>
+<td style="text-align:left;">
+ENSG00000198169.8
+</td>
+<td style="text-align:left;">
+ZNF251
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+231
+</td>
+<td style="text-align:left;">
+chr19
+</td>
+<td style="text-align:right;">
+52797409
+</td>
+<td style="text-align:right;">
+52857600
+</td>
+<td style="text-align:left;">
+ENSG00000198538.10
+</td>
+<td style="text-align:left;">
+ZNF28
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+205
+</td>
+<td style="text-align:left;">
+chr17
+</td>
+<td style="text-align:right;">
+18658429
+</td>
+<td style="text-align:right;">
+18682262
+</td>
+<td style="text-align:left;">
+ENSG00000249459.8
+</td>
+<td style="text-align:left;">
+ZNF286B
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+208
+</td>
+<td style="text-align:left;">
+chr19
+</td>
+<td style="text-align:right;">
+34677639
+</td>
+<td style="text-align:right;">
+34686397
+</td>
+<td style="text-align:left;">
+ENSG00000089335.20
+</td>
+<td style="text-align:left;">
+ZNF302
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+11
+</td>
+<td style="text-align:left;">
+chr10
+</td>
+<td style="text-align:right;">
+38094334
+</td>
+<td style="text-align:right;">
+38150293
+</td>
+<td style="text-align:left;">
+ENSG00000075407.18
+</td>
+<td style="text-align:left;">
+ZNF37A
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+163
+</td>
+<td style="text-align:left;">
+chr19
+</td>
+<td style="text-align:right;">
+57900296
+</td>
+<td style="text-align:right;">
+57916610
+</td>
+<td style="text-align:left;">
+ENSG00000173480.10
+</td>
+<td style="text-align:left;">
+ZNF417
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+225
+</td>
+<td style="text-align:left;">
+chr19
+</td>
+<td style="text-align:right;">
+57487711
+</td>
+<td style="text-align:right;">
+57496097
+</td>
+<td style="text-align:left;">
+ENSG00000105136.20
+</td>
+<td style="text-align:left;">
+ZNF419
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+76
+</td>
+<td style="text-align:left;">
+chr19
+</td>
+<td style="text-align:right;">
+52031379
+</td>
+<td style="text-align:right;">
+52095738
+</td>
+<td style="text-align:left;">
+ENSG00000256087.6
+</td>
+<td style="text-align:left;">
+ZNF432
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+45
+</td>
+<td style="text-align:left;">
+chr19
+</td>
+<td style="text-align:right;">
+19785839
+</td>
+<td style="text-align:right;">
+19821751
+</td>
+<td style="text-align:left;">
+ENSG00000081665.13
+</td>
+<td style="text-align:left;">
+ZNF506
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+169
+</td>
+<td style="text-align:left;">
+chr19
+</td>
+<td style="text-align:right;">
+36534774
+</td>
+<td style="text-align:right;">
+36605276
+</td>
+<td style="text-align:left;">
+ENSG00000186020.12
+</td>
+<td style="text-align:left;">
+ZNF529
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+199
+</td>
+<td style="text-align:left;">
+chr19
+</td>
+<td style="text-align:right;">
+7069444
+</td>
+<td style="text-align:right;">
+7087968
+</td>
+<td style="text-align:left;">
+ENSG00000130544.11
+</td>
+<td style="text-align:left;">
+ZNF557
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+72
+</td>
+<td style="text-align:left;">
+chr19
+</td>
+<td style="text-align:right;">
+36182060
+</td>
+<td style="text-align:right;">
+36246257
+</td>
+<td style="text-align:left;">
+ENSG00000196357.11
+</td>
+<td style="text-align:left;">
+ZNF565
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+10
+</td>
+<td style="text-align:left;">
+chr17
+</td>
+<td style="text-align:right;">
+5179536
+</td>
+<td style="text-align:right;">
+5191883
+</td>
+<td style="text-align:left;">
+ENSG00000180626.9
+</td>
+<td style="text-align:left;">
+ZNF594
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+196
+</td>
+<td style="text-align:left;">
+chr19
+</td>
+<td style="text-align:right;">
+52012765
+</td>
+<td style="text-align:right;">
+52030240
+</td>
+<td style="text-align:left;">
+ENSG00000142556.18
+</td>
+<td style="text-align:left;">
+ZNF614
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+40
+</td>
+<td style="text-align:left;">
+chr19
+</td>
+<td style="text-align:right;">
+21291160
+</td>
+<td style="text-align:right;">
+21329425
+</td>
+<td style="text-align:left;">
+ENSG00000182141.10
+</td>
+<td style="text-align:left;">
+ZNF708
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+227
+</td>
+<td style="text-align:left;">
+chr16
+</td>
+<td style="text-align:right;">
+31713229
+</td>
+<td style="text-align:right;">
+31794869
+</td>
+<td style="text-align:left;">
+ENSG00000197302.10
+</td>
+<td style="text-align:left;">
+ZNF720
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+150
+</td>
+<td style="text-align:left;">
+chrX
+</td>
+<td style="text-align:right;">
+135248920
+</td>
+<td style="text-align:right;">
+135344087
+</td>
+<td style="text-align:left;">
+ENSG00000186376.14
+</td>
+<td style="text-align:left;">
+ZNF75D
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+43
+</td>
+<td style="text-align:left;">
+chr19
+</td>
+<td style="text-align:right;">
+53431993
+</td>
+<td style="text-align:right;">
+53458261
+</td>
+<td style="text-align:left;">
+ENSG00000160336.14
+</td>
+<td style="text-align:left;">
+ZNF761
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+16
+</td>
+<td style="text-align:left;">
+chr19
+</td>
+<td style="text-align:right;">
+53389793
+</td>
+<td style="text-align:right;">
+53430413
+</td>
+<td style="text-align:left;">
+ENSG00000196417.12
+</td>
+<td style="text-align:left;">
+ZNF765
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+145
+</td>
+<td style="text-align:left;">
+chr19
+</td>
+<td style="text-align:right;">
+52269571
+</td>
+<td style="text-align:right;">
+52296046
+</td>
+<td style="text-align:left;">
+ENSG00000196214.10
+</td>
+<td style="text-align:left;">
+ZNF766
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+47
+</td>
+<td style="text-align:left;">
+chr19
+</td>
+<td style="text-align:right;">
+57466663
+</td>
+<td style="text-align:right;">
+57477570
+</td>
+<td style="text-align:left;">
+ENSG00000197128.11
+</td>
+<td style="text-align:left;">
+ZNF772
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+112
+</td>
+<td style="text-align:left;">
+chr19
+</td>
+<td style="text-align:right;">
+57746796
+</td>
+<td style="text-align:right;">
+57758159
+</td>
+<td style="text-align:left;">
+ENSG00000152443.12
+</td>
+<td style="text-align:left;">
+ZNF776
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+181
+</td>
+<td style="text-align:left;">
+chr19
+</td>
+<td style="text-align:right;">
+40028260
+</td>
+<td style="text-align:right;">
+40056209
+</td>
+<td style="text-align:left;">
+ENSG00000128000.15
+</td>
+<td style="text-align:left;">
+ZNF780B
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+224
+</td>
+<td style="text-align:left;">
+chrX
+</td>
+<td style="text-align:right;">
+47836902
+</td>
+<td style="text-align:right;">
+48002561
+</td>
+<td style="text-align:left;">
+ENSG00000197779.13
+</td>
+<td style="text-align:left;">
+ZNF81
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+21
+</td>
+<td style="text-align:left;">
+chr19
+</td>
+<td style="text-align:right;">
+57848731
+</td>
+<td style="text-align:right;">
+57889074
+</td>
+<td style="text-align:left;">
+ENSG00000204514.9
+</td>
+<td style="text-align:left;">
+ZNF814
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+34
+</td>
+<td style="text-align:left;">
+chr19
+</td>
+<td style="text-align:right;">
+52949379
+</td>
+<td style="text-align:right;">
+52962911
+</td>
+<td style="text-align:left;">
+ENSG00000180257.13
+</td>
+<td style="text-align:left;">
+ZNF816
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+33
+</td>
+<td style="text-align:left;">
+chr19
+</td>
+<td style="text-align:right;">
+52928475
+</td>
+<td style="text-align:right;">
+52962823
+</td>
+<td style="text-align:left;">
+ENSG00000221874.4
+</td>
+<td style="text-align:left;">
+ZNF816-ZNF321P
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+103
+</td>
+<td style="text-align:left;">
+chr19
+</td>
+<td style="text-align:right;">
+11721265
+</td>
+<td style="text-align:right;">
+11739009
+</td>
+<td style="text-align:left;">
+ENSG00000197933.12
+</td>
+<td style="text-align:left;">
+ZNF823
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+54
+</td>
+<td style="text-align:left;">
+chr19
+</td>
+<td style="text-align:right;">
+53333746
+</td>
+<td style="text-align:right;">
+53356906
+</td>
+<td style="text-align:left;">
+ENSG00000213799.12
+</td>
+<td style="text-align:left;">
+ZNF845
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+179
+</td>
+<td style="text-align:left;">
+chr3
+</td>
+<td style="text-align:right;">
+44494847
+</td>
+<td style="text-align:right;">
+44510636
+</td>
+<td style="text-align:left;">
+ENSG00000178917.16
+</td>
+<td style="text-align:left;">
+ZNF852
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+154
+</td>
+<td style="text-align:left;">
+chr19
+</td>
+<td style="text-align:right;">
+52904417
+</td>
+<td style="text-align:right;">
+52923481
+</td>
+<td style="text-align:left;">
+ENSG00000213793.5
+</td>
+<td style="text-align:left;">
+ZNF888
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+20
+</td>
+<td style="text-align:left;">
+chr2
+</td>
+<td style="text-align:right;">
+135136916
+</td>
+<td style="text-align:right;">
+135531236
+</td>
+<td style="text-align:left;">
+ENSG00000121988.17
+</td>
+<td style="text-align:left;">
+ZRANB3
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+143
+</td>
+<td style="text-align:left;">
+chr18
+</td>
+<td style="text-align:right;">
+35251058
+</td>
+<td style="text-align:right;">
+35290245
+</td>
+<td style="text-align:left;">
+ENSG00000186814.13
+</td>
+<td style="text-align:left;">
+ZSCAN30
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+190
+</td>
+<td style="text-align:left;">
+chr1
+</td>
+<td style="text-align:right;">
+45016399
+</td>
+<td style="text-align:right;">
+45306209
+</td>
+<td style="text-align:left;">
+ENSG00000162415.6
+</td>
+<td style="text-align:left;">
+ZSWIM5
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="lincrnas-overlaping-peaks" class="section level3">
+<h3>LincRNAs overlaping peaks</h3>
+<p>Bear in mind that one peak can overlap ore than one genomic feature.</p>
+<table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+seqnames
+</th>
+<th style="text-align:right;">
+start
+</th>
+<th style="text-align:right;">
+end
+</th>
+<th style="text-align:left;">
+gene_id
+</th>
+<th style="text-align:left;">
+gene_name
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+chr2
+</td>
+<td style="text-align:right;">
+97416165
+</td>
+<td style="text-align:right;">
+97433527
+</td>
+<td style="text-align:left;">
+ENSG00000230606.10
+</td>
+<td style="text-align:left;">
+AC092683.1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+chr2
+</td>
+<td style="text-align:right;">
+97421075
+</td>
+<td style="text-align:right;">
+97434847
+</td>
+<td style="text-align:left;">
+ENSG00000278766.2
+</td>
+<td style="text-align:left;">
+AC092683.2
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+chr2
+</td>
+<td style="text-align:right;">
+95807118
+</td>
+<td style="text-align:right;">
+95816215
+</td>
+<td style="text-align:left;">
+ENSG00000232931.5
+</td>
+<td style="text-align:left;">
+LINC00342
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+chr22
+</td>
+<td style="text-align:right;">
+30969245
+</td>
+<td style="text-align:right;">
+30979395
+</td>
+<td style="text-align:left;">
+ENSG00000253352.9
+</td>
+<td style="text-align:left;">
+TUG1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+chr22
+</td>
+<td style="text-align:right;">
+30976515
+</td>
+<td style="text-align:right;">
+30978848
+</td>
+<td style="text-align:left;">
+ENSG00000269987.1
+</td>
+<td style="text-align:left;">
+AC004542.2
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+chr22
+</td>
+<td style="text-align:right;">
+30977516
+</td>
+<td style="text-align:right;">
+30977858
+</td>
+<td style="text-align:left;">
+ENSG00000269972.1
+</td>
+<td style="text-align:left;">
+AC004542.1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+chr2
+</td>
+<td style="text-align:right;">
+97281904
+</td>
+<td style="text-align:right;">
+97291780
+</td>
+<td style="text-align:left;">
+ENSG00000277701.4
+</td>
+<td style="text-align:left;">
+AC159540.2
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+chr6
+</td>
+<td style="text-align:right;">
+71295173
+</td>
+<td style="text-align:right;">
+71417436
+</td>
+<td style="text-align:left;">
+ENSG00000269966.1
+</td>
+<td style="text-align:left;">
+AL136164.2
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+chr6
+</td>
+<td style="text-align:right;">
+71344344
+</td>
+<td style="text-align:right;">
+71420769
+</td>
+<td style="text-align:left;">
+ENSG00000233237.6
+</td>
+<td style="text-align:left;">
+LINC00472
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+chr6
+</td>
+<td style="text-align:right;">
+30234039
+</td>
+<td style="text-align:right;">
+30326134
+</td>
+<td style="text-align:left;">
+ENSG00000270604.5
+</td>
+<td style="text-align:left;">
+HCG17
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+chr19
+</td>
+<td style="text-align:right;">
+27684580
+</td>
+<td style="text-align:right;">
+27793940
+</td>
+<td style="text-align:left;">
+ENSG00000261824.6
+</td>
+<td style="text-align:left;">
+LINC00662
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+chr19
+</td>
+<td style="text-align:right;">
+27757184
+</td>
+<td style="text-align:right;">
+27760849
+</td>
+<td style="text-align:left;">
+ENSG00000261770.1
+</td>
+<td style="text-align:left;">
+AC006504.1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+chr13
+</td>
+<td style="text-align:right;">
+95648733
+</td>
+<td style="text-align:right;">
+95676925
+</td>
+<td style="text-align:left;">
+ENSG00000247400.3
+</td>
+<td style="text-align:left;">
+DNAJC3-DT
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+chr6
+</td>
+<td style="text-align:right;">
+2245748
+</td>
+<td style="text-align:right;">
+2482022
+</td>
+<td style="text-align:left;">
+ENSG00000250903.8
+</td>
+<td style="text-align:left;">
+GMDS-DT
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+chr11
+</td>
+<td style="text-align:right;">
+59130133
+</td>
+<td style="text-align:right;">
+59143015
+</td>
+<td style="text-align:left;">
+ENSG00000245571.6
+</td>
+<td style="text-align:left;">
+FAM111A-DT
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+chr19
+</td>
+<td style="text-align:right;">
+19761038
+</td>
+<td style="text-align:right;">
+19821716
+</td>
+<td style="text-align:left;">
+ENSG00000267581.1
+</td>
+<td style="text-align:left;">
+AC011477.4
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+chr18
+</td>
+<td style="text-align:right;">
+3284145
+</td>
+<td style="text-align:right;">
+3327292
+</td>
+<td style="text-align:left;">
+ENSG00000266578.1
+</td>
+<td style="text-align:left;">
+AP001025.1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+chr5
+</td>
+<td style="text-align:right;">
+43061395
+</td>
+<td style="text-align:right;">
+43062441
+</td>
+<td style="text-align:left;">
+ENSG00000272144.1
+</td>
+<td style="text-align:left;">
+AC025171.4
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+chr8
+</td>
+<td style="text-align:right;">
+142981738
+</td>
+<td style="text-align:right;">
+143018437
+</td>
+<td style="text-align:left;">
+ENSG00000247317.3
+</td>
+<td style="text-align:left;">
+LY6E-DT
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+chr12
+</td>
+<td style="text-align:right;">
+9240003
+</td>
+<td style="text-align:right;">
+9257960
+</td>
+<td style="text-align:left;">
+ENSG00000237248.5
+</td>
+<td style="text-align:left;">
+LINC00987
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+chr12
+</td>
+<td style="text-align:right;">
+9240406
+</td>
+<td style="text-align:right;">
+9261050
+</td>
+<td style="text-align:left;">
+ENSG00000256427.2
+</td>
+<td style="text-align:left;">
+AC010175.1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+chr1
+</td>
+<td style="text-align:right;">
+148295895
+</td>
+<td style="text-align:right;">
+148344636
+</td>
+<td style="text-align:left;">
+ENSG00000224481.2
+</td>
+<td style="text-align:left;">
+AC245100.1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+chrX
+</td>
+<td style="text-align:right;">
+115917271
+</td>
+<td style="text-align:right;">
+115969089
+</td>
+<td style="text-align:left;">
+ENSG00000235244.3
+</td>
+<td style="text-align:left;">
+DANT2
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+chr21
+</td>
+<td style="text-align:right;">
+22008944
+</td>
+<td style="text-align:right;">
+22098459
+</td>
+<td style="text-align:left;">
+ENSG00000233215.5
+</td>
+<td style="text-align:left;">
+LINC01687
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+chr12
+</td>
+<td style="text-align:right;">
+79341205
+</td>
+<td style="text-align:right;">
+79503396
+</td>
+<td style="text-align:left;">
+ENSG00000257894.2
+</td>
+<td style="text-align:left;">
+AC027288.3
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+chr1
+</td>
+<td style="text-align:right;">
+229258281
+</td>
+<td style="text-align:right;">
+229271028
+</td>
+<td style="text-align:left;">
+ENSG00000177788.5
+</td>
+<td style="text-align:left;">
+AL162595.1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+chr2
+</td>
+<td style="text-align:right;">
+118132128
+</td>
+<td style="text-align:right;">
+118222250
+</td>
+<td style="text-align:left;">
+ENSG00000226856.6
+</td>
+<td style="text-align:left;">
+THORLNC
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+chr10
+</td>
+<td style="text-align:right;">
+125700436
+</td>
+<td style="text-align:right;">
+125719566
+</td>
+<td style="text-align:left;">
+ENSG00000224023.10
+</td>
+<td style="text-align:left;">
+FLJ37035
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+chr14
+</td>
+<td style="text-align:right;">
+28830244
+</td>
+<td style="text-align:right;">
+28968400
+</td>
+<td style="text-align:left;">
+ENSG00000258038.5
+</td>
+<td style="text-align:left;">
+LINC02327
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+chr9
+</td>
+<td style="text-align:right;">
+95759231
+</td>
+<td style="text-align:right;">
+95875977
+</td>
+<td style="text-align:left;">
+ENSG00000175611.11
+</td>
+<td style="text-align:left;">
+LINC00476
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+chr21
+</td>
+<td style="text-align:right;">
+15928296
+</td>
+<td style="text-align:right;">
+16645065
+</td>
+<td style="text-align:left;">
+ENSG00000215386.12
+</td>
+<td style="text-align:left;">
+MIR99AHG
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+chr21
+</td>
+<td style="text-align:right;">
+22098617
+</td>
+<td style="text-align:right;">
+22116528
+</td>
+<td style="text-align:left;">
+ENSG00000184856.6
+</td>
+<td style="text-align:left;">
+LINC00308
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+chr6
+</td>
+<td style="text-align:right;">
+140575788
+</td>
+<td style="text-align:right;">
+140898381
+</td>
+<td style="text-align:left;">
+ENSG00000285875.1
+</td>
+<td style="text-align:left;">
+AL035446.2
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+chr19
+</td>
+<td style="text-align:right;">
+53007512
+</td>
+<td style="text-align:right;">
+53013180
+</td>
+<td style="text-align:left;">
+ENSG00000267943.1
+</td>
+<td style="text-align:left;">
+AC010328.1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+chr4
+</td>
+<td style="text-align:right;">
+134759399
+</td>
+<td style="text-align:right;">
+134817289
+</td>
+<td style="text-align:left;">
+ENSG00000249000.1
+</td>
+<td style="text-align:left;">
+AC093722.1
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div id="overlap-with-repeats" class="section level2">
+<h2>Overlap with repeats</h2>
+<p>Families of repeats that overlap with peaks that are loss in TKO with respect to D3:</p>
+<p>PieChart showing the proportion of classes of repeats overlapped by TKO/D3 peaks.</p>
+<p>TKO/D3 peaks overlap with repetitive elements. Because H3K9me3 regions controlled by TASOR extend over many thousand of bases, most peaks overlap with more than one repeat. Their characteristics are summarised in Figure (pie chart).</p>
+<p><img src="04_overlaps_files/figure-html/piechart1-1.png" width="672" /></p>
+<p>This second piechart shows the same information but distributed into different bespoke categories.</p>
+<p><img src="04_overlaps_files/figure-html/piechart2-1.png" width="672" /></p>
+</div>
 
 
 
+</div>
+</div>
 
 </div>
 
@@ -341,6 +6069,32 @@ $(document).ready(function () {
 
 <!-- code folding -->
 
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = false;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
 
 <!-- dynamically load mathjax for compatibility with self-contained -->
 <script>
