@@ -94,6 +94,7 @@ ggplot(fc1,aes(n,log.rpkm)) + geom_point(aes(color= "all genes" )) +
 ```
 
 ```{r, wrap-up}
+sessionInfo()
 save.image("RData/05b_geneExpression_TASOR.RData")
 
 ```

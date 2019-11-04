@@ -81,6 +81,7 @@ text(x = 10000, y = 3, labels = "median RPKM", col = "blue")
 ```
 
 ```{r, wrap-up}
+sessionInfo()
 save.image("RData/05_geneExpression.RData")
 
 ```

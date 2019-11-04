@@ -221,9 +221,9 @@ ggplot(data = dt, mapping = aes(logCPM, logFC)) +
 ```
 
 
-
 ```{r wrap_up}
 rm(s,set,y, ctrl_cons_pks)
+sessionInfo()
 save.image("RData/03_Ruvseq_diffEnrich.RData")
 ```
 

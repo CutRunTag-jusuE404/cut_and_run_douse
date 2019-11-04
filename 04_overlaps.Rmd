@@ -323,7 +323,7 @@ p2.plot.pie
 
 
 ```{r, wrap_up}
-rm(annot,reps)
+sessionInfo()
 save.image("RData/04_overlaps.RData")
 ```
 

@@ -335,6 +335,7 @@ p2.plot.pie
 
 
 ```{r, wrap_up}
+sessionInfo()
 save.image("RData/04b_overlaps_TASOR.RData")
 ```
 

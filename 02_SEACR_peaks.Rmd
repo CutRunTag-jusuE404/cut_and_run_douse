@@ -120,7 +120,9 @@ text(1:length(d3_olap.rate),d3_olap.rate[1:length(d3_olap.rate)], labels = d3_ol
 
 Ideally, the number of peaks should plato as the number of overlaps increases. This is not the case for these samples probably because there is much variation among samples. Therefore, we proceed with a permissive set of peak as we will only focus on those that that are differentially enriched/bound.
 
+
 ```{r, wrap_up}
+sessionInfo()
 rm(mypks, ctrl_mdata, d3_mdata)
 save.image("RData/02_SEACR_peaks.RData")
 ```
