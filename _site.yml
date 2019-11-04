@@ -1,7 +1,7 @@
 name: "Cut&Run Douse"
 output_dir: "."
 navbar:
-  title: "Anna's analysis"
+  #title: "Anna's analysis"
   left:
     - text: "Intro"
       href: index.html
