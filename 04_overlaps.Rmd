@@ -62,7 +62,7 @@ OL1.t = sort(table(genes[unique(subjectHits(OL1))]$gene_type))
 
 A summary barplot is shown below, the categories are somehow selected for:
 
-```{r, barplot1_prep_data}
+```{r, table1_prep_data}
 OL1.df = data.frame(OL1.t)
 OL1.df$type = c(rep("smallRNA", 2)
                 , "lncRNA"
@@ -74,7 +74,10 @@ OL1.df$type = c(rep("smallRNA", 2)
                 , "lncRNA"
                 , "coding"
                 )
-kable(OL1.df, "html") %>%
+
+OL1.table = OL1.df
+colnames(OL1.table) = c("gencode class", "frequency", "our class")
+kable(OL1.table, "html") %>%
   kable_styling(full_width = F)
 
 OL1.df = aggregate(OL1.df[,2], by=list(OL1.df$type), FUN=sum)
@@ -83,12 +86,13 @@ OL1.df = aggregate(OL1.df[,2], by=list(OL1.df$type), FUN=sum)
 
 ```{r, barplot1, fig.height=5, fig.width=5}
 library(viridis)
-
+OL1.df$Group.1 = factor(OL1.df$Group.1, c("coding","lncRNA","pseudo","smallRNA","other"))
 ggplot(data = OL1.df, aes(x=factor(Group.1), y = x, fill = Group.1)) + 
   geom_bar(colour = "black", stat = "identity") +
-  labs(y = "counts", x = "genomic feature") +
+  labs(y = "Number of genes", x = "Genomic feature") +
   theme(axis.title = element_text(size = 20)
         , axis.text = element_text(size = 12, colour = "black")
+        , axis.title.x = element_text(size = 13, colour = "black", face = "bold")
         , legend.position =  "none"
         #, legend.title = element_text(size = 15, face = "bold")
         #, legend.text = element_text(size = 13, face = "bold")
@@ -96,8 +100,6 @@ ggplot(data = OL1.df, aes(x=factor(Group.1), y = x, fill = Group.1)) +
         #, legend.key.size = unit(0.8, "cm")
   ) +
   scale_fill_viridis(discrete = T, option = "B", direction = -1)
-
-
 ```
 
 Among the protein coding genes, there are `r length(grep("^ZNF",genes[unique(subjectHits(OL1))]$gene_name))` ZNF genes (of a total of `r length(grep("^ZNF",genes$gene_name))` annotated in the genome).
@@ -143,7 +145,8 @@ all = genes[unique(subjectHits(OL1))]
 pc = all[which(all$gene_type == "protein_coding"),]
 pc.t = as.data.frame(pc)[,c(1:3,7,9)]
 pc.t = pc.t[order(pc.t$gene_name),]
-kable(pc.t, "html") %>%
+colnames(pc.t)[1] = c("chrom")
+kable(pc.t, "html", row.names = F) %>%
   kable_styling(full_width = F)
 
 ```
@@ -158,7 +161,7 @@ Bear in mind that one peak can overlap ore than one genomic feature.
 ```{r, lincRNAs}
 linc = all[grep("ncRNA",all$gene_type)]
 linc.t = as.data.frame(linc)[,c(1:3,7,9)]
-
+colnames(linc.t)[1] = "chrom"
 kable(linc.t, "html") %>%
   kable_styling(full_width = F)
 
@@ -307,11 +310,11 @@ p2.plot.pie = p2.plot + coord_polar("y", start=0) +
         #, legend.key.size = unit(0.8, "cm")
   )  +
   #geom_text() +
-  annotate("text", label = perc[1], size=5, x = 1.7, y = c(0.75)) +
-  annotate("text", label = perc[2], size=5, x = 1.7, y = c(0.30)) +
-  annotate("text", label = perc[3], size=5, x = 1.7, y = c(0.13)) +
-  annotate("text", label = perc[4], size=5, x = 1.7, y = c(0.08)) +
-  annotate("text", label = perc[5], size=5, x = 1.7, y = c(0.02)) 
+  annotate("text", label = perc[1], size=4, x = 1.7, y = c(0.75)) +
+  annotate("text", label = perc[2], size=4, x = 1.7, y = c(0.30)) +
+  annotate("text", label = perc[3], size=4, x = 1.7, y = c(0.13)) +
+  annotate("text", label = perc[4], size=4, x = 1.7, y = c(0.08)) +
+  annotate("text", label = perc[5], size=4, x = 1.7, y = c(0.02)) 
 
 p2.plot.pie
 

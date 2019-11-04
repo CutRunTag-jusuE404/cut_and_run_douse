@@ -385,6 +385,7 @@ div.tocify {
 
 <p>In this section we look at the expression of genes regulated by TKO/TASOR. We found these genes in previous steps by looking at the overlap between peaks that dissapear in TKO samples with respect to D3 and the gene annotation.</p>
 <p>We then used RNAseq data from a “D3” sample, remove gene with less than <code>min.count</code> reads and computed RPKMs using the length of added exons (to account only for the coding region of the gene)</p>
+<p>We can repeat the analysis with triplicates for the counts of D3 sample. In this case, the total read counts for each gene is calculated as the mean of the three samples obtained.</p>
 <p><img src="05_geneExpression_files/figure-html/plot1-1.png" width="672" /></p>
 
 

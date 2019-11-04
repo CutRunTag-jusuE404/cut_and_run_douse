@@ -27,6 +27,8 @@ library(edgeR)
 
 In this section we look at the expression of genes regulated by TKO/TASOR. We found these genes in previous steps by looking at the overlap between peaks that dissapear in TKO samples with respect to D3 and the gene annotation.
 
+We then used RNAseq data from a "D3" sample, remove gene with less than `min.count` reads and computed RPKMs using the length of added exons (to account only for the coding region of the gene)
+
 ```{r, load_data}
 load("RData/04_overlaps.RData")
 
@@ -47,14 +49,34 @@ fc2 = fc1[which(fc1$Geneid %in% genes$gene_id),]
 
 ```
 
-We then used RNAseq data from a "D3" sample, remove gene with less than `min.count` reads and computed RPKMs using the length of added exons (to account only for the coding region of the gene)
+We can repeat the analysis with triplicates for the counts of D3 sample. In this case, the total read counts for each gene is calculated as the mean of the three samples obtained. 
+
+```{r, load_data_2}
+fc = read.table("data/rnaseq/RNA-seq-D3-Nat-Genet-allreps-pairedendON", skip = 1, header = T)[,c(1,6:9)]
+fc$mean = apply(fc[,3:5], 1, mean)
+min.count = 10
+fc1 = fc[which(fc$mean > min.count),]
+fc1$n = 1:length(fc1$Geneid)
+fc1$log.c = log(fc1$mean)
+fc1$rpkm = rpkm(fc1$mean, gene.length = fc1$Length) #lenth as reported in FC is the length of exons and not of gene. 
+fc1$log.rpkm = log(fc1$rpkm)
+
+fc2 = fc1[which(fc1$Geneid %in% genes$gene_name),]
+
+```
+
 
 ```{r, plot1}
 
 plot(fc1$n, fc1$log.rpkm, pch = 19, ylab = "Log RPKM", xlab = "genes", col = "grey", xaxt = "n", main = "Expression of genes found in TKO/D3 peaks (red)\nin a wild-type D3 cell line")
 points(fc2$n, fc2$log.rpkm, pch = 19, col = "red")
 abline(h = median(fc1$log.rpkm), col = "blue", lty = 2, lwd=3)
-text(x = 11000, y = 3, labels = "median RPKM", col = "blue")
+text(x = 10000, y = 3, labels = "median RPKM", col = "blue")
+
+```
+
+```{r, GG_plot1}
+
 
 ```
 
