@@ -1,0 +1,340 @@
+---
+title: "Overlaps TASOR peaks"
+author: "Anna V. Protasio"
+date: "04/11/2019"
+output:
+  html_document:
+    toc: true
+    toc_float:
+      collapsed: false
+---
+
+```{r setup, include=FALSE, echo=F, message=FALSE}
+rm(list=ls())
+
+require("knitr")
+knitr::opts_chunk$set(echo = F, warning=FALSE, message=FALSE, root.dir = "/Volumes/GoogleDrive/Shared drives/Douse_Protasio/git_repo/cut_and_run_douse")
+```
+
+```{r, lib_loading}
+library(RColorBrewer)
+library(kableExtra)
+library(tidyr)
+library(GenomicRanges)
+library(ggplot2)
+```
+
+In this section, we investigate overlaps of **TASOR** peaks with the different genomic features. 
+
+## TASOR  peaks
+
+This dataset was produced by Chris.D with the following summary:
+
+Method:
+Called:
+-against three different controls (2 x IgG, 1 x TASOR KO) with SEACR (stringent cut off, with normalisation)
+
+Filtered out:
+-anything that *wasn't* called in *all three* SEACR runs with the three different controls
+-false positive peaks (those called in TKO with SEACR using relaxed cutoff)
+-anything that overlapped with HeLa ATAC-seq peak list from Dekker lab 2019 CTCF paper (this is because CUT&Tag is prone to ATAC-like artifacts).
+-overlaps with centromeres and telomeres
+-anything < 2kb
+
+
+849 in total remaining.
+
+```{r, load_image1}
+tasor.peaks = rtracklayer::import("data/Peaks-seacr/TASORpeaks.2000long.clean.blacklistremoved.bed")
+
+```
+
+The total number of peaks is `r dim(tasor.peaks)[1]`. 
+
+
+## Overlap with gene features (a.k.a genes)
+
+
+```{r, overlap_genes}
+#annot = rtracklayer::import("~/Documents/Work/REF/Annotation/gencode.v29.annotation.gtf")
+#genes = annot[which(annot$type == "gene"),c(2,5:7)]
+#saveRDS(genes, "RData/genes_04.RData")
+
+genes = readRDS("RData/genes_04.RData")
+
+OL1 = findOverlaps(query = tasor.peaks, subject = genes)
+OL1.t = sort(table(genes[unique(subjectHits(OL1))]$gene_type))
+
+```
+
+A summary table is shown below:
+
+```{r, table1_prep_data}
+OL1.df = data.frame(rev(OL1.t))
+OL1.df$type = c("coding"
+                , "other"
+                , "lncRNA"
+                , rep("pseudo", 3)
+                , rep("other", 2)
+                , "smallRNA"
+                , "pseudo"
+                , "smallRNA"
+                , rep("other", 3)
+                , "smallRNA"
+                , rep("pseudo",5)
+                , "other"
+                )
+
+OL1.table = OL1.df
+colnames(OL1.table) = c("gencode class", "frequency", "our class")
+kable(OL1.table, "html") %>%
+  kable_styling(full_width = F)
+
+OL1.df = aggregate(OL1.df[,2], by=list(OL1.df$type), FUN=sum)
+  
+```
+
+```{r, barplot1, fig.height=5, fig.width=5}
+library(viridis)
+OL1.df$Group.1 = factor(OL1.df$Group.1, c("coding","lncRNA","pseudo","smallRNA","other"))
+ggplot(data = OL1.df, aes(x=factor(Group.1), y = x, fill = Group.1)) + 
+  geom_bar(colour = "black", stat = "identity") +
+  labs(y = "Number of genes", x = "Genomic feature") +
+  theme(axis.title = element_text(size = 20)
+        , axis.text = element_text(size = 12, colour = "black")
+        , axis.title.x = element_text(size = 13, colour = "black", face = "bold")
+        , legend.position =  "none"
+        #, legend.title = element_text(size = 15, face = "bold")
+        #, legend.text = element_text(size = 13, face = "bold")
+        #, legend.spacing.y = unit(0.1, "cm")
+        #, legend.key.size = unit(0.8, "cm")
+  ) +
+  scale_fill_viridis(discrete = T, option = "B", direction = -1)
+```
+
+Among the protein coding genes, there are `r length(grep("^ZNF",genes[unique(subjectHits(OL1))]$gene_name))` ZNF genes (of a total of `r length(grep("^ZNF",genes$gene_name))` annotated in the genome).
+
+
+Testing for enrichment of ZNFs in peaks. 
+
+```{r, phyper_ZNF}
+## Prepare a two-dimensional contingency table
+contingency.table <- data.frame(matrix(nrow=2, ncol=2))
+rownames(contingency.table) <- c("yes.peak", "no.peak")
+colnames(contingency.table) <- c("ZNF", "no.ZNF")
+
+peaks.on.genes = genes[unique(subjectHits(OL1))]$gene_name
+prot_cod = genes[which(genes$gene_type == "protein_coding"),]
+znfs = prot_cod[grep("^ZNF",prot_cod$gene_name),]
+  
+## Assign the values one by one to make sure we put them in the right
+## place (this is not necessary, we could enter the 4 values in a
+## single instruction).
+contingency.table["yes.peak", "ZNF"] <- length(grep("ZNF",peaks.on.genes)) ## ZNFs over peaks
+contingency.table["yes.peak", "no.ZNF"] <- length(grep("ZNF",peaks.on.genes, invert = T)) ## non ZNFs genes over paks
+contingency.table["no.peak", "ZNF"] <- length(znfs) - length(grep("ZNF",peaks.on.genes)) ## ZNFs not in peaks 
+contingency.table["no.peak", "no.ZNF"] <- length(prot_cod) -  length(znfs) ## non ZNFs in peaks
+
+print(contingency.table)
+
+```
+
+We apply Fisher Exact test where the H~0~ is that the proportion of ZNFs found in peaks is the same as the proportion found in the general pool of genes vs the alternative H~A~ which states that the proportion of ZNFs in peaks is greater than that of the general pool of genes. 
+
+```{r, fisher_test}
+fisher.test(x=contingency.table, alternative="greater")
+
+```
+
+The P-value indicates that we reject the H~0~ in the favor of H~A~.
+
+### Protein coding overlaping peaks
+
+```{r, protein_cod}
+all = genes[unique(subjectHits(OL1))]
+pc = all[which(all$gene_type == "protein_coding"),]
+pc.t = as.data.frame(pc)[,c(1:3,7,9)]
+pc.t = pc.t[order(pc.t$gene_name),]
+colnames(pc.t)[1] = c("chrom")
+kable(pc.t, "html", row.names = F) %>%
+  kable_styling(full_width = F)
+
+```
+
+
+
+
+### LincRNAs overlaping peaks
+
+Bear in mind that one peak can overlap ore than one genomic feature. 
+
+```{r, lincRNAs}
+linc = all[grep("ncRNA",all$gene_type)]
+linc.t = as.data.frame(linc)[,c(1:3,7,9)]
+colnames(linc.t)[1] = "chrom"
+kable(linc.t, "html") %>%
+  kable_styling(full_width = F)
+
+```
+
+
+## Overlap with repeats
+
+Families of repeats that overlap with peaks that are loss in TKO with respect to D3:
+
+```{r, overlap_repeats}
+#reps = rtracklayer::import("~/Documents/Work/REF/Annotation/rm.dfam2.0.hg38.fa.out.my.gff")
+#reps.500 = reps[which(width(reps) > 500)]
+#saveRDS(reps.500, "RData/reps.500_04.RData")
+reps.500 = readRDS("RData/reps.500_04.RData")
+
+OL2 = findOverlaps(query = tasor.peaks, subject = reps.500)
+OL2.t = table(as.data.frame(reps.500[subjectHits(OL2)])$Family)
+
+ol2 = data.frame(mcols(reps.500[subjectHits(OL2),c(5:6)]))
+
+```
+
+```{r, piechart1_prep_data}
+ol2$type = "other"
+#ol2$type[grep("L1", ol2$Target)] = "other"
+ol2$type[grep("L1P", ol2$Target)] = "L1P"
+ol2$type[grep("L1M", ol2$Target)] = "L1M"
+ol2$type[grep("L2", ol2$Target)] = "L2"
+ol2$type[grep("^DNA", ol2$Family)] = "DNA"
+#ol2$type[grep("^LTR", ol2$Family)] = "other"
+ol2$type[grep("^ERV1", ol2$Family)] = "ERV1"
+ol2$type[grep("^ERVK", ol2$Family)] = "ERVK"
+ol2$type[grep("^ERVL", ol2$Family)] = "ERVL"
+ol2$fam = "other"
+ol2$fam[grep("LINE/L1", ol2$Family)] = "LINE/L1"
+ol2$fam[grep("LINE/L2", ol2$Family)] = "LINE/L2"
+ol2$fam[grep("DNA", ol2$Family)] = "DNA"
+ol2$fam[grep("LTR", ol2$Family)] = "LTR"
+
+ol3 = data.frame(ol2[,c(3:4)], stringsAsFactors = F)
+
+# define function for blank_theme for plot
+blank_theme <- theme_minimal()+
+  theme(
+    axis.title.x = element_blank(),
+    axis.title.y = element_blank(),
+    panel.border = element_blank(),
+    panel.grid=element_blank(),
+    axis.ticks = element_blank(),
+    plot.title=element_text(size=14, face="bold")
+  )
+
+
+ol3$fam = factor(ol3$fam, c( "LINE/L1", "LINE/L2", "LTR", "DNA","other"  ))
+# calculate percentages
+perc = paste(round(table(ol3$fam)/sum(table(ol3$fam))*100, digits = 1),"%",sep="")
+```
+
+PieChart showing the proportion of classes of repeats overlapped by TASOR peaks. 
+
+TAOSR peaks overlap with repetitive elements. Because peaks can extend for many thousand of bases (the largest peak is `r max(width(tasor.peaks))` ), most peaks overlap with more than one repeat. Their characteristics are summarised in Figure (pie chart).
+
+```{r, piechart1}
+p1.plot  = ggplot(data = ol3, aes(x = "", fill = fam)) + 
+  geom_bar(position = "fill", colour = "black", stat = "count") +
+  labs(y = "Proportion", x = "repeats") +
+  theme(axis.title = element_text(size = 15)
+        , plot.title = element_text(hjust = 0.5, size = 25)
+        , axis.text.x = element_text(size = 15)
+        , axis.text.y = element_text(size = 12)
+        #, axis.title.x = element_blank()
+        ) + 
+  scale_fill_viridis(discrete = T, direction = -1)
+
+
+# make it into a pie chart
+p1.plot.pie = p1.plot + coord_polar("y", start=0) +
+  blank_theme +
+  theme(axis.text.x=element_blank()
+        , legend.title = element_blank()
+        #, legend.title = element_text(size = 13, face = "bold")
+        , legend.text = element_text(size = 11, face = "bold")
+        #, legend.spacing.y = unit(0.1, "cm")
+        #, legend.key.size = unit(0.8, "cm")
+  )  +
+  #geom_text() +
+  annotate("text", label = perc[1], size=5, x = 1, y = c(0.75)) +
+  annotate("text", label = perc[2], size=5, x = 1.7, y = c(0.46)) +
+  annotate("text", label = perc[3], size=5, x = 1.7, y = c(0.26)) +
+  annotate("text", label = perc[4], size=5, x = 1.7, y = c(0.14)) +
+  annotate("text", label = perc[5], size=5, x = 1.7, y = c(0.07))
+
+p1.plot.pie 
+ 
+```
+
+
+This second piechart shows the same information but distributed into different bespoke categories. 
+
+```{r, piechart2_prep_data}
+ol2 = data.frame(mcols(reps.500[subjectHits(OL2),c(5:6)]))
+
+ol2$type = "other"
+ol2$type[grep("L1", ol2$Target)] = "other L1"
+ol2$type[grep("L1P", ol2$Target)] = "L1P"
+ol2$type[grep("L2", ol2$Target)] = "L2"
+ol2$type[grep("^DNA", ol2$Family)] = "DNA"
+#ol2$type[grep("^LTR", ol2$Family)] = "other"
+ol2$type[grep("^LTR", ol2$Family)] = "LTR"
+ol2$fam = "other"
+ol2$fam[grep("LINE/L1", ol2$Family)] = "LINE/L1"
+ol2$fam[grep("LINE/L2", ol2$Family)] = "LINE/L2"
+ol2$fam[grep("DNA", ol2$Family)] = "DNA"
+ol2$fam[grep("LTR", ol2$Family)] = "LTR"
+
+ol2$type = factor(ol2$type, c("L1P","other L1", "L2","LTR","DNA","other"))
+
+# calculate percentages
+perc = paste(round(table(ol2$type)/sum(table(ol2$type))*100, digits = 1), "%",sep="")
+names(perc) = names(table(ol2$type)/sum(table(ol2$type)))
+
+```
+
+
+```{r, piechart2}
+p2.plot  = ggplot(data = ol2, aes(x = "", fill = type)) + 
+  geom_bar(position = "fill", colour = "black", stat = "count") +
+  labs(y = "Proportion", x = "repeats") +
+  theme(axis.title = element_text(size = 15)
+        , plot.title = element_text(hjust = 0.5, size = 25)
+        , axis.text.x = element_text(size = 15)
+        , axis.text.y = element_text(size = 12)
+        #, axis.title.x = element_blank()
+        ) + 
+  scale_fill_viridis(discrete = T, direction = -1)
+
+
+# make it into a pie chart
+p2.plot.pie = p2.plot + coord_polar("y", start=0) +
+  blank_theme +
+  theme(axis.text.x=element_blank()
+        , legend.title = element_blank()
+        #, legend.title = element_text(size = 13, face = "bold")
+        , legend.text = element_text(size = 11, face = "bold")
+        #, legend.spacing.y = unit(0.1, "cm")
+        #, legend.key.size = unit(0.8, "cm")
+  )  +
+  #geom_text() +
+  annotate("text", label = perc[1], size=4, x = 1.7, y = c(0.90)) +
+  annotate("text", label = perc[2], size=4, x = 1.7, y = c(0.65)) +
+  annotate("text", label = perc[3], size=4, x = 1.7, y = c(0.47)) +
+  annotate("text", label = perc[4], size=4, x = 1.7, y = c(0.27)) +
+  annotate("text", label = perc[5], size=4, x = 1.7, y = c(0.15)) +
+  annotate("text", label = perc[6], size=4, x = 1.7, y = c(0.07))
+
+p2.plot.pie
+
+```
+
+
+
+```{r, wrap_up}
+save.image("RData/04b_overlaps_TASOR.RData")
+```
+

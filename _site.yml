@@ -13,3 +13,7 @@ navbar:
       href: 04_overlaps.html
     - text: "Gene Expression"
       href: 05_geneExpression.html
+    - text: "Overlaps TASOR peaks"
+      href: 04b_overlaps_TASOR.html
+    - text: "Gene Expression TASOR peaks"
+      href: 05b_geneExpression_TASOR.html

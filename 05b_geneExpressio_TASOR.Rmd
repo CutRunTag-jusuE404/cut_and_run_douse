@@ -1,0 +1,100 @@
+---
+title: "Gene expression TASOR peaks"
+author: "Anna V. Protasio"
+date: "04/11/2019"
+output:
+  html_document:
+    toc: true
+    toc_float:
+      collapsed: false
+---
+
+```{r setup, include=FALSE, echo=F, message=FALSE}
+rm(list=ls())
+
+require("knitr")
+knitr::opts_chunk$set(echo = F, warning=FALSE, message=FALSE, root.dir = "/Volumes/GoogleDrive/Shared drives/Douse_Protasio/git_repo/cut_and_run_douse")
+```
+
+```{r, lib_loading}
+library(RColorBrewer)
+library(kableExtra)
+library(tidyr)
+library(GenomicRanges)
+library(ggplot2)
+library(edgeR)
+```
+
+In this section we look at the expression of genes that overlap with the TASOR list of peaks.
+
+We use RNAseq data from a "D3" samples, remove gene with less than `min.count` reads and computed RPKMs using the length of added exons (to account only for the coding region of the gene)
+
+```{r, load_data}
+load("RData/04b_overlaps_TASOR.RData")
+
+fc = read.table("data/rnaseq/RNA-seq-D3", skip = 1, header = T)[,c(1,6:7)]
+colnames(fc)[2:3] = c("length", "counts")
+min.count = 10
+fc1 = fc[which(fc$counts > min.count),]
+fc1$n = 1:length(fc1$Geneid)
+fc1$log.c = log(fc1$counts)
+fc1$rpkm = rpkm(fc1$counts, gene.length = fc1$length) #lenth as reported in FC is the length of exons and not of gene. 
+fc1$log.rpkm = log(fc1$rpkm)
+
+genes = readRDS("RData/genes_04.RData")
+genes = genes[unique(subjectHits(OL1))]
+
+# create new dataset with the genes that were defined as overlapping with the peak list
+fc2 = fc1[which(fc1$Geneid %in% genes$gene_id),]
+
+```
+
+We can repeat the analysis with triplicates for the counts of D3 sample. In this case, the total read counts for each gene is calculated as the mean of the three samples obtained. 
+
+```{r, load_data_2}
+fc = read.table("data/rnaseq/RNA-seq-D3-Nat-Genet-allreps-pairedendON", skip = 1, header = T)[,c(1,6:9)]
+fc$mean = apply(fc[,3:5], 1, mean)
+min.count = 10
+fc1 = fc[which(fc$mean > min.count),]
+fc1$n = 1:length(fc1$Geneid)
+fc1$log.c = log(fc1$mean)
+fc1$rpkm = rpkm(fc1$mean, gene.length = fc1$Length) #lenth as reported in FC is the length of exons and not of gene. 
+fc1$log.rpkm = log(fc1$rpkm)
+
+fc2 = fc1[which(fc1$Geneid %in% genes$gene_name),]
+
+```
+
+
+```{r, plot1}
+
+plot(fc1$n, fc1$log.rpkm, pch = 19, ylab = "Log RPKM", xlab = "genes", col = "grey", xaxt = "n", main = "Expression of genes found in TKO/D3 peaks (red)\nin a wild-type D3 cell line")
+points(fc2$n, fc2$log.rpkm, pch = 19, col = "red")
+abline(h = median(fc1$log.rpkm), col = "blue", lty = 2, lwd=3)
+text(x = 10000, y = 3, labels = "median RPKM", col = "blue")
+
+```
+
+```{r, GG_plot1}
+ggplot(fc1,aes(n,log.rpkm)) + geom_point(aes(color= "all genes" )) +
+  geom_point(data=fc2,aes(color="genes on peaks")) +
+  geom_hline(yintercept = median(fc1$log.rpkm), linetype="dashed", color = "blue", size = 1) +
+  scale_color_manual(values = c("#999999", "#82206CFF")) +  # (viridis_pal()(2)) +
+  labs(color="") +
+  ylab(expression(paste("Log"[2],"RPKM"))) +
+  xlab("Genes in alphabetical order") +
+  theme(axis.text.x = element_blank()
+        , axis.text.y = element_text(size = 10)
+        , axis.ticks.x = element_blank()
+        , axis.title = element_text(size = 10)
+        , legend.text = element_text(size = 8)
+  ) +
+  annotate("text", label = "median RPKM", x = 10000, y = 3, color = "blue")
+
+```
+
+```{r, wrap-up}
+save.image("RData/05b_geneExpression_TASOR.RData")
+
+```
+
