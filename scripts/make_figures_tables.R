@@ -161,9 +161,6 @@ ggplot(data = OL1.df, aes(x=factor(Group.1), y = x, fill = Group.1)) +
 dev.off()
 
 
-
-
-
 # table2  -----------------------------------------------------------------
 
 WriteXLS::WriteXLS(ExcelFileName = "tables/Table2_protein_coding_genes_overlap.xls", pc.t , col.names = T, row.names = F, AdjWidth = T)
@@ -172,7 +169,6 @@ WriteXLS::WriteXLS(ExcelFileName = "tables/Table2_protein_coding_genes_overlap.x
 # table3 ------------------------------------------------------------------
 
 WriteXLS::WriteXLS(ExcelFileName = "tables/Table3_lncRNA_genes_overlap.xls", linc.t , col.names = T, row.names = F, AdjWidth = T)
-
 
 
 
@@ -194,6 +190,80 @@ load("RData/05_geneExpression.RData")
 
 # plot11 ------------------------------------------------------------------
 tiff(filename = "figures/plot11_scatterplot_RPKM.tiff", units = "cm", width = 15, height = 10, res = 300)
+
+ggplot(fc1,aes(n,log.rpkm)) + geom_point(aes(color= "all genes" )) +
+  geom_point(data=fc2,aes(color="genes on peaks")) +
+  geom_hline(yintercept = median(fc1$log.rpkm), linetype="dashed", color = "blue", size = 1) +
+  scale_color_manual(values = c("#999999", "#82206CFF")) +  # (viridis_pal()(2)) +
+  labs(color="") +
+  ylab(expression(paste("Log"[2],"RPKM"))) +
+  xlab("Genes in alphabetical order") +
+  theme(axis.text.x = element_blank()
+        , axis.text.y = element_text(size = 10)
+        , axis.ticks.x = element_blank()
+        , axis.title = element_text(size = 10)
+        , legend.text = element_text(size = 8)
+  ) +
+  annotate("text", label = "median RPKM", x = 10000, y = 3, color = "blue")
+dev.off()
+
+# overlaps TASOR ---------------------------------------------------------
+
+load("RData/04b_overlaps_TASOR.RData")
+
+# table4 ------------------------------------------------------------------
+
+WriteXLS::WriteXLS(ExcelFileName = "tables/Table4_GenFeat_overlap_tasor.xls",OL1.table, col.names = T, row.names = F, AdjWidth = T)
+
+# plot12 - barplot ---------------------------------------------------------
+
+tiff(filename = "figures/plot12_barplot_GenFeat_overlap_tasor.tiff", units = "cm", width = 10, height = 10, res = 300)
+
+ggplot(data = OL1.df, aes(x=factor(Group.1), y = x, fill = Group.1)) + 
+  geom_bar(colour = "black", stat = "identity") +
+  labs(y = "Number of genes", x = "Genomic feature") +
+  theme(axis.title = element_text(size = 15, colour = "black")
+        , axis.text = element_text(size = 11, colour = "black")
+        , legend.position =  "none"
+        #, legend.title = element_text(size = 15, face = "bold")
+        #, legend.text = element_text(size = 13, face = "bold")
+        #, legend.spacing.y = unit(0.1, "cm")
+        #, legend.key.size = unit(0.8, "cm")
+  ) +
+  scale_fill_viridis(discrete = T, option = "B", direction = -1)
+
+dev.off()
+
+
+# table5  -----------------------------------------------------------------
+
+WriteXLS::WriteXLS(ExcelFileName = "tables/Table5_protein_coding_genes_overlap_tasor.xls", pc.t , col.names = T, row.names = F, AdjWidth = T)
+
+
+# table6 ------------------------------------------------------------------
+
+WriteXLS::WriteXLS(ExcelFileName = "tables/Table6_lncRNA_genes_overlap_tasor.xls", linc.t , col.names = T, row.names = F, AdjWidth = T)
+
+
+
+# plot13 - piechart1 -------------------------------------------------------
+tiff(filename = "figures/plot13_piechart1_repeats_tasor.tiff", units = "cm", width = 10, height = 10, res = 300)
+p1.plot.pie
+dev.off()
+
+
+# plot14 - piechart2 ------------------------------------------------------
+tiff(filename = "figures/plot14_piechart2_repeats_tasor.tiff", units = "cm", width = 10, height = 10, res = 300)
+p2.plot.pie
+dev.off()
+
+
+# gene expression ---------------------------------------------------------
+
+load("RData/05b_geneExpression_TASOR.RData")
+
+# plot15 ------------------------------------------------------------------
+tiff(filename = "figures/plot15_scatterplot_RPKM_tasor.tiff", units = "cm", width = 15, height = 10, res = 300)
 
 ggplot(fc1,aes(n,log.rpkm)) + geom_point(aes(color= "all genes" )) +
   geom_point(data=fc2,aes(color="genes on peaks")) +
