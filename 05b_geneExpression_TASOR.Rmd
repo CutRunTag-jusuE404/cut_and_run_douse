@@ -68,7 +68,7 @@ fc2 = fc1[which(fc1$Geneid %in% genes$gene_name),]
 
 ```{r, plot1}
 
-plot(fc1$n, fc1$log.rpkm, pch = 19, ylab = "Log RPKM", xlab = "genes", col = "grey", xaxt = "n", main = "Expression of genes found in TKO/D3 peaks (red)\nin a wild-type D3 cell line")
+plot(fc1$n, fc1$log.rpkm, pch = 19, ylab = "Log RPKM", xlab = "genes", col = "grey", xaxt = "n", main = "Expression of genes found in TASOR peaks (red)\nin a wild-type D3 cell line")
 points(fc2$n, fc2$log.rpkm, pch = 19, col = "red")
 abline(h = median(fc1$log.rpkm), col = "blue", lty = 2, lwd=3)
 text(x = 10000, y = 3, labels = "median RPKM", col = "blue")
